@@ -1,0 +1,11 @@
+{
+  "name": "mock-didi",
+  "description": "Mock del API de DiDi Food (órdenes, tiendas, reclamos) + firma MD5.",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  }
+}

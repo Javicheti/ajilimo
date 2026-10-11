@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1070705235554",
+    "project_id": "ajilimo-830ca",
+    "storage_bucket": "ajilimo-830ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070705235554:android:0178fdde79e0a43c59633b",
+        "android_client_info": {
+          "package_name": "com.ajilimo.korn_tablet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDujvzhstepZQDJCLU9hiFSYCcpkaR_Vzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

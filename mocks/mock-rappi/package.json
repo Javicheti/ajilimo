@@ -1,0 +1,11 @@
+{
+  "name": "mock-rappi",
+  "description": "Mock del API de Rappi (contrato documentado) + emisor de webhooks firmados.",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  }
+}

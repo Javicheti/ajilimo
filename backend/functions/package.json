@@ -1,0 +1,24 @@
+{
+  "name": "ajilimo-functions",
+  "description": "AjíLimo — backend (Cloud Functions + conectores).",
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "npm run build && node --test \"lib/**/*.test.js\"",
+    "deploy": "npm run build && firebase deploy --only functions --project ajilimo-830ca --account javicheti001@gmail.com",
+    "logs": "firebase functions:log --project ajilimo-830ca --account javicheti001@gmail.com"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  }
+}

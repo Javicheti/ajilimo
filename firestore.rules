@@ -1,0 +1,53 @@
+rules_version = '2';
+
+// AjíLimo · Reglas base de Firestore (tenant-aware, deny-by-default).
+// El acceso se resuelve por custom claims: request.auth.token.tenants = { [tenantId]: rol }
+// y request.auth.token.admin == true para super administradores.
+// NOTA: esquema provisional de Fase 0; se ajustará por módulo.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function hasTenantAccess(tenantId) {
+      return isSuperAdmin() ||
+        (signedIn() &&
+          request.auth.token.tenants != null &&
+          request.auth.token.tenants[tenantId] != null);
+    }
+
+    function canEdit(tenantId) {
+      return isSuperAdmin() ||
+        (signedIn() &&
+          request.auth.token.tenants != null &&
+          request.auth.token.tenants[tenantId] in ['owner', 'admin', 'supervisor']);
+    }
+
+    // Perfil del propio usuario.
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Raíz multi-tenant: todo lo demás cuelga de /tenants/{tenantId}/...
+    match /tenants/{tenantId} {
+      allow read: if hasTenantAccess(tenantId);
+      allow write: if canEdit(tenantId);
+
+      match /{document=**} {
+        allow read: if hasTenantAccess(tenantId);
+        allow write: if canEdit(tenantId);
+      }
+    }
+
+    // Cualquier otra ruta queda cerrada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
