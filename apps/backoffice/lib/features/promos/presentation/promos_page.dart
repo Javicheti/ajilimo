@@ -16,7 +16,7 @@ class PromosPage extends ConsumerWidget {
     int count(PromoState state) => items.where((i) => i.state == state).length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Promociones y sabores')),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 980),

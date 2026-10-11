@@ -43,7 +43,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light(),
-        home: const DesignGalleryPage(),
+        home: const Scaffold(body: DesignGalleryPage()),
       ),
     );
     await tester.pump();

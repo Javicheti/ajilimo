@@ -1,4 +1,5 @@
 import 'package:ajilimo_shared/ajilimo_shared.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,27 +30,24 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     final int sodas = rows.fold(0, (sum, r) => sum + r.sodaUnits);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reporte de ventas'),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: Spacing.md),
-            child: Center(
-              child: FilledButton.icon(
-                onPressed: () => _export(context, rows),
-                icon: const Icon(Icons.download_outlined),
-                label: const Text('Exportar CSV'),
-              ),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FilledButton.icon(
+                    onPressed: () => _export(context, rows),
+                    icon: const Icon(Icons.download_outlined),
+                    label: const Text('Exportar CSV'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Spacing.md),
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.md,
@@ -61,6 +59,10 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                   _kpi(context, 'Alas (u)', '$wings', c.info, Icons.set_meal_outlined),
                   _kpi(context, 'Gaseosas (u)', '$sodas', c.info, Icons.local_drink_outlined),
                 ],
+              ),
+              const SizedBox(height: Spacing.lg),
+              AppCard(
+                child: SizedBox(height: 240, child: _SalesChart(rows: rows)),
               ),
               const SizedBox(height: Spacing.lg),
               SectionHeader(
@@ -138,6 +140,45 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cerrar'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SalesChart extends StatelessWidget {
+  const _SalesChart({required this.rows});
+  final List<SalesRow> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    if (rows.isEmpty) {
+      return Center(child: Text('Sin datos', style: Theme.of(context).textTheme.bodyMedium));
+    }
+    final double maxY = rows.map((r) => r.paidAmount).fold<double>(0, (m, v) => v > m ? v : m);
+    final Color accent = context.colors.brandPrimary;
+
+    return BarChart(
+      BarChartData(
+        maxY: maxY == 0 ? 1 : maxY * 1.2,
+        alignment: BarChartAlignment.spaceAround,
+        borderData: FlBorderData(show: false),
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
+        barTouchData: BarTouchData(enabled: false),
+        barGroups: <BarChartGroupData>[
+          for (int i = 0; i < rows.length; i++)
+            BarChartGroupData(
+              x: i,
+              barRods: <BarChartRodData>[
+                BarChartRodData(
+                  toY: rows[i].paidAmount,
+                  color: accent,
+                  width: 18,
+                  borderRadius: BorderRadius.circular(Radii.sm),
+                ),
+              ],
+            ),
         ],
       ),
     );

@@ -6,3 +6,8 @@ import '../data/claims_repository.dart';
 final Provider<ClaimsRepository> claimsRepositoryProvider = Provider<ClaimsRepository>(
   (ref) => ClaimsRepository(api: ref.read(apiClientProvider)),
 );
+
+/// Nº de reclamos pendientes (para el badge del sidebar).
+final Provider<int> pendingClaimsCountProvider = Provider<int>(
+  (ref) => ref.watch(claimsRepositoryProvider).seed(DateTime.now()).length,
+);

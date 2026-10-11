@@ -44,22 +44,14 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
     int count(StoreStatus status) => rows.where((r) => r.status == status).length;
     final alerts = rows.where((r) => r.status != StoreStatus.open).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Torre de control'),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: Spacing.md),
-            child: Center(
-              child: Text('${rows.length} tiendas', style: Theme.of(context).textTheme.labelMedium),
-            ),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(Spacing.lg),
-        children: <Widget>[
-          Wrap(
+    return ListView(
+      padding: const EdgeInsets.all(Spacing.lg),
+      children: <Widget>[
+        PageHeader(
+          title: 'Torre de control',
+          subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención',
+        ),
+        Wrap(
             spacing: Spacing.md,
             runSpacing: Spacing.md,
             children: <Widget>[
@@ -161,8 +153,7 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
                   ),
           ),
         ],
-      ),
-    );
+      );
   }
 
   Widget _kpi(BuildContext context, String label, int value, Color accent, IconData icon) {

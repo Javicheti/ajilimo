@@ -59,20 +59,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
         _orders.where((o) => o.cookingState(now) == CookingState.overdue).length;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Órdenes · Cooking time'),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: Spacing.md),
-            child: Center(
-              child: Text(
-                'Objetivo 22 min',
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),

@@ -24,8 +24,6 @@ void main() {
     await tester.pumpWidget(build());
     await tester.pump();
 
-    expect(find.text('Órdenes · Cooking time'), findsOneWidget);
-    expect(find.text('Objetivo 22 min'), findsOneWidget);
     expect(find.text('Excedido'), findsOneWidget);
     expect(find.text('Tomar (22 min)'), findsOneWidget);
   });

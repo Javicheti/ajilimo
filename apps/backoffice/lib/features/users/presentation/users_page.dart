@@ -17,7 +17,7 @@ class UsersPage extends ConsumerWidget {
     final bool canManage = myRole.can(Permission.manageUsers);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios y permisos')),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1000),

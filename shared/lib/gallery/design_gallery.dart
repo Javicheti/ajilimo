@@ -6,6 +6,7 @@ import '../models/delivery.dart';
 import '../widgets/app_card.dart';
 import '../widgets/channel_badge.dart';
 import '../widgets/kpi_card.dart';
+import '../widgets/page_header.dart';
 import '../widgets/section_header.dart';
 import '../widgets/status_chip.dart';
 
@@ -15,19 +16,17 @@ class DesignGalleryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Design System — AjíLimo')),
-      body: ListView(
-        padding: const EdgeInsets.all(Spacing.lg),
-        children: const <Widget>[
-          _Section(title: 'Estados de tienda', child: _StatusRow()),
-          _Section(title: 'Canales', child: _ChannelRow()),
-          _Section(title: 'KPIs', child: _KpiRow()),
-          _Section(title: 'Tipografía', child: _TypographyShowcase()),
-          _Section(title: 'Colores semánticos', child: _ColorShowcase()),
-          _Section(title: 'Botones y campos', child: _ControlsShowcase()),
-        ],
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(Spacing.lg),
+      children: const <Widget>[
+        PageHeader(title: 'Design System — AjíLimo', subtitle: 'Tokens, componentes y tipografía'),
+        _Section(title: 'Estados de tienda', child: _StatusRow()),
+        _Section(title: 'Canales', child: _ChannelRow()),
+        _Section(title: 'KPIs', child: _KpiRow()),
+        _Section(title: 'Tipografía', child: _TypographyShowcase()),
+        _Section(title: 'Colores semánticos', child: _ColorShowcase()),
+        _Section(title: 'Botones y campos', child: _ControlsShowcase()),
+      ],
     );
   }
 }

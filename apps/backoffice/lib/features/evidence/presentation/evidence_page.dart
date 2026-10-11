@@ -15,7 +15,7 @@ class EvidencePage extends ConsumerWidget {
     final int complete = records.where((r) => r.complete).length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Evidencia (KORN)')),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),

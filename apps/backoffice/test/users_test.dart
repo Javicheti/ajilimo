@@ -46,7 +46,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Usuarios y permisos'), findsOneWidget);
+    expect(find.text('Usuarios'), findsWidgets);
     expect(find.text('Ana'), findsOneWidget);
     expect(find.text('Roles y permisos'), findsOneWidget);
   });

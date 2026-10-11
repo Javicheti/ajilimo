@@ -16,7 +16,6 @@ void main() {
       ),
     );
 
-    expect(find.text('Promociones y sabores'), findsOneWidget);
     expect(find.text('Activo'), findsWidgets);
     expect(find.text('Apagado'), findsWidgets);
     expect(find.text('Suspendido'), findsWidgets);

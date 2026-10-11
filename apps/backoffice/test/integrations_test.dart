@@ -22,7 +22,6 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(build());
 
-    expect(find.text('Configuración · Integraciones'), findsOneWidget);
     expect(find.text('Rappi'), findsWidgets);
     expect(find.text('DiDi'), findsWidgets);
     expect(find.text('PedidosYa'), findsWidgets);

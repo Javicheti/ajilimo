@@ -16,7 +16,6 @@ void main() {
       ),
     );
 
-    expect(find.text('Evidencia (KORN)'), findsOneWidget);
     expect(find.text('R-4821'), findsOneWidget);
     expect(find.text('Evidencia completa'), findsWidgets);
     expect(find.text('Evidencia incompleta'), findsOneWidget);

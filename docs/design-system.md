@@ -38,9 +38,20 @@ shared/lib/design/
 - **Sora** (títulos) + **Inter** (datos), con **cifras tabulares** (`FontFeature.tabularFigures`).
 - Fuentes **empaquetadas** en `shared/assets/fonts/` (sin fetch en runtime).
 
+## Shell y navegación
+La plataforma usa un **AppShell** (`shared/lib/navigation/app_shell.dart`):
+- **Sidebar vertical** (fondo carbón) con marca, **grupos** (Operación, Defensa, Analítica,
+  Configuración, Sistema), **ítem activo** con acento de marca, **badges** (p. ej. reclamos) y
+  **tarjeta de usuario** (rol + menú: tema / cerrar sesión).
+- **Topbar** con título de página, notificaciones y menú de cuenta.
+- **Responsive**: sidebar expandida (≥1080), rail de íconos (720–1080) y **drawer** (<720).
+- **Gate por rol**: ítems como Usuarios/Tenants se ocultan sin permiso.
+- Rutas autenticadas se montan con **`ShellRoute`** (go_router); `/login` queda fuera del shell.
+
 ## Componentes (Fase 0)
-`AppCard`, `StatusChip` (abierto/cerrado/pausado/suspendido/alta demanda), `ChannelBadge`,
-`KpiCard`, `SectionHeader`. Galería viva en la ruta **`/design`**.
+`AppShell`, `NavGroup`/`NavEntry`, `PageHeader`, `EmptyState`, `AppCard`, `StatusChip`,
+`ChannelBadge`, `KpiCard`, `SectionHeader`; **gráficos** con `fl_chart` (Reportes).
+Galería viva en la ruta **`/design`**.
 
 Componentes previstos: `DataTable`, `AlertFeed`, `CountdownTimer` (24 h), `EvidenceViewer`,
 `ScheduleEditor`, `FilterBar`, `EmptyState`, `SkeletonLoader`, `Chart`.

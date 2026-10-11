@@ -16,7 +16,6 @@ void main() {
       ),
     );
 
-    expect(find.text('Reporte de ventas'), findsOneWidget);
     expect(find.text('Culminados'), findsWidgets);
     expect(find.text('Alas (u)'), findsOneWidget);
     expect(find.text('Monto pagado'), findsOneWidget);

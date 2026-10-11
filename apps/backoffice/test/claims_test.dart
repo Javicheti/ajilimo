@@ -21,7 +21,6 @@ void main() {
     await tester.pumpWidget(build());
     await tester.pump();
 
-    expect(find.text('Reclamos · DiDi'), findsOneWidget);
     expect(find.text('Pendientes'), findsOneWidget);
     expect(find.text('D-3310'), findsOneWidget);
     expect(find.text('Calidad del producto'), findsOneWidget);

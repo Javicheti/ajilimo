@@ -29,20 +29,11 @@ class _TenantsPageState extends ConsumerState<TenantsPage> {
     final List<Tenant> tenants = ref.watch(tenantsRepositoryProvider).all();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tenants (SaaS)'),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: Spacing.md),
-            child: Center(
-              child: FilledButton.icon(
-                onPressed: _createTenant,
-                icon: const Icon(Icons.add_business_outlined),
-                label: const Text('Nuevo tenant'),
-              ),
-            ),
-          ),
-        ],
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FilledButton.icon(
+        onPressed: _createTenant,
+        icon: const Icon(Icons.add_business_outlined),
+        label: const Text('Nuevo tenant'),
       ),
       body: Center(
         child: ConstrainedBox(

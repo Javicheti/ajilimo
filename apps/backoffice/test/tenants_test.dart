@@ -12,7 +12,6 @@ void main() {
 
   testWidgets('Lista tenants existentes', (WidgetTester tester) async {
     await tester.pumpWidget(build());
-    expect(find.text('Tenants (SaaS)'), findsOneWidget);
     expect(find.text('AjíLimo (Operador)'), findsOneWidget);
     expect(find.text('slug: ajilimo'), findsOneWidget);
   });

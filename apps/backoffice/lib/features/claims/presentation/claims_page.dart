@@ -59,7 +59,7 @@ class _ClaimsPageState extends ConsumerState<ClaimsPage> {
     final int critical = _claims.where((c) => c.urgencyAt(now) == ClaimUrgency.critical).length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reclamos · DiDi')),
+      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 980),
