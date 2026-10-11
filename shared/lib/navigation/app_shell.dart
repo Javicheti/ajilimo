@@ -197,18 +197,22 @@ class _Header extends StatelessWidget {
         children: <Widget>[
           SizedBox(
             width: leftWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
-              child: Row(
-                children: <Widget>[
-                  if (showMenu)
-                    IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
-                  else
-                    AppLogo(
-                      size: leftWidth > 100 ? 40 : 46,
-                      emblemOnly: leftWidth <= 100,
-                    ),
-                ],
+            child: ClipRect(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+                child: Row(
+                  children: <Widget>[
+                    if (showMenu)
+                      IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
+                    else
+                      Flexible(
+                        child: AppLogo(
+                          size: leftWidth > 100 ? 40 : 46,
+                          emblemOnly: leftWidth <= 100,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -332,7 +336,15 @@ class _UserMenu extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(userName, style: Theme.of(context).textTheme.titleSmall),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: Text(
+                  userName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
               Text('⭐ $userRoleLabel', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: c.textMid)),
             ],
           ),

@@ -5,7 +5,6 @@ import 'elevations.dart';
 import 'semantic_colors.dart';
 import 'tokens.dart';
 import 'typography.dart';
-
 /// Construye el [ThemeData] de AjíLimo a partir de los tokens y una [BrandPalette].
 class AppTheme {
   const AppTheme._();
@@ -36,6 +35,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
+      fontFamily: AppTypography.bodyFamily,
       scaffoldBackgroundColor: colors.background,
       textTheme: text,
       extensions: <ThemeExtension<dynamic>>[colors],
