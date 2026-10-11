@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: AjilimoApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('AjíLimo'), findsOneWidget);
+    expect(find.text('AjíLimo'), findsWidgets);
     expect(find.text('Ver design system'), findsOneWidget);
   });
 

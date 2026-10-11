@@ -1,14 +1,28 @@
 import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class HomePage extends StatelessWidget {
+import '../../auth/presentation/auth_providers.dart';
+
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppColors c = context.colors;
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('AjíLimo'),
+        actions: <Widget>[
+          IconButton(
+            tooltip: 'Cerrar sesión',
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authServiceProvider)?.signOut(),
+          ),
+          const SizedBox(width: Spacing.xs),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
@@ -104,11 +118,11 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Fase 0 — Fundaciones', style: Theme.of(context).textTheme.titleMedium),
+                      Text('Centro de control', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: Spacing.xs),
                       Text(
-                        'Proyecto, design system y base de apps listos. '
-                        'Siguiente: conector Rappi + configuración/secretos (Fase 1).',
+                        'Torre de control, órdenes, promos, reportes, evidencia y reclamos. '
+                        'Funciona con datos de prueba locales; listo para credenciales reales.',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
