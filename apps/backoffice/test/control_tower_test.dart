@@ -6,16 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:backoffice/core/api/api_client.dart';
 import 'package:backoffice/features/control_tower/presentation/control_tower_page.dart';
 
-class _FakeApi extends ApiClient {
-  _FakeApi(this._rows);
-  final List<Map<String, dynamic>> _rows;
-
-  @override
-  Future<List<Map<String, dynamic>>> getControlTower() async => _rows;
-}
+import 'support/fake_api.dart';
 
 Widget build(List<Map<String, dynamic>> rows) => ProviderScope(
-      overrides: [apiClientProvider.overrideWithValue(_FakeApi(rows))],
+      overrides: [apiClientProvider.overrideWithValue(FakeApi(controlTower: rows))],
       child: MaterialApp(theme: AppTheme.light(), home: const ControlTowerPage()),
     );
 

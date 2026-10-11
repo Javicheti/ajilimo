@@ -4,6 +4,7 @@ import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/orders_repository.dart';
 import '../domain/order.dart';
 import 'orders_providers.dart';
 
@@ -21,10 +22,22 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
   @override
   void initState() {
     super.initState();
-    _orders = ref.read(ordersRepositoryProvider).seed(DateTime.now());
+    final OrdersRepository repository = ref.read(ordersRepositoryProvider);
+    _orders = repository.seed(DateTime.now());
+    _loadRemote(repository);
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _loadRemote(OrdersRepository repository) async {
+    try {
+      final List<DeliveryOrder> remote = await repository.fetchRemote();
+      if (!mounted || remote.isEmpty) return;
+      setState(() => _orders = remote);
+    } catch (_) {
+      // Sin BFF disponible: se mantienen los datos ficticios locales.
+    }
   }
 
   @override

@@ -87,6 +87,17 @@ export function createApp() {
       });
     }
 
+    if (method === 'GET' && path === '/v1/order/claims') {
+      const now = Date.now();
+      return json(res, 200, {
+        claims: [
+          { claim_id: 'C-1', order_id: 'D-3310', reason: 'quality', amount: 31.8, created_at: new Date(now - 2 * 3600e3).toISOString() },
+          { claim_id: 'C-2', order_id: 'D-3305', reason: 'incomplete', amount: 45.0, created_at: new Date(now - 18 * 3600e3).toISOString() },
+          { claim_id: 'C-3', order_id: 'D-3299', reason: 'insufficient', amount: 22.5, created_at: new Date(now - 21 * 3600e3).toISOString() },
+        ],
+      });
+    }
+
     if (method === 'POST' && path === '/v1/order/confirm') {
       const body = await readBody(req);
       return json(res, 200, { ok: true, order_id: body.order_id });

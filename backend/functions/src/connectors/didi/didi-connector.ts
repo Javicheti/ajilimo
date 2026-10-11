@@ -14,9 +14,27 @@ export interface ClaimDecision {
   note?: string;
 }
 
+/** Reclamo normalizado de DiDi. */
+export interface DidiClaim {
+  claimId: string;
+  orderId: string;
+  reason: string;
+  amount: number;
+  createdAt: string;
+}
+
+interface DidiClaimDto {
+  claim_id?: string;
+  order_id?: string;
+  reason?: string;
+  amount?: number;
+  created_at?: string;
+}
+
 /** Interfaz opcional para canales que exponen gestión de reclamos (DiDi). */
 export interface SupportsClaims {
   respondToClaim(orderId: string, decision: ClaimDecision): Promise<void>;
+  getClaims(): Promise<DidiClaim[]>;
 }
 
 interface DidiStoreDto {
@@ -130,5 +148,19 @@ export class DidiConnector implements DeliveryConnector, SupportsClaims {
       headers: this.headers(),
       body: { order_id: orderId, accept: decision.accept, note: decision.note ?? '' },
     });
+  }
+
+  async getClaims(): Promise<DidiClaim[]> {
+    const data = await requestJson<{ claims?: DidiClaimDto[] }>({
+      url: `${this.context.baseUrl}/v1/order/claims`,
+      headers: this.headers(),
+    });
+    return (data.claims ?? []).map((claim) => ({
+      claimId: claim.claim_id ?? '',
+      orderId: claim.order_id ?? '',
+      reason: claim.reason ?? '',
+      amount: claim.amount ?? 0,
+      createdAt: claim.created_at ?? new Date().toISOString(),
+    }));
   }
 }

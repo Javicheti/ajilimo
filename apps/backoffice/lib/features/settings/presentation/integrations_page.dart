@@ -2,6 +2,7 @@ import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/integrations_repository.dart';
 import '../domain/integration.dart';
 import 'integrations_providers.dart';
 
@@ -19,7 +20,19 @@ class _IntegrationsPageState extends ConsumerState<IntegrationsPage> {
   @override
   void initState() {
     super.initState();
-    _items = List<Integration>.of(ref.read(integrationsRepositoryProvider).seed());
+    final IntegrationsRepository repository = ref.read(integrationsRepositoryProvider);
+    _items = List<Integration>.of(repository.seed());
+    _loadRemote(repository);
+  }
+
+  Future<void> _loadRemote(IntegrationsRepository repository) async {
+    try {
+      final List<Integration> remote = await repository.fetchRemote();
+      if (!mounted || remote.isEmpty) return;
+      setState(() => _items = remote);
+    } catch (_) {
+      // Sin BFF disponible: se mantienen los datos ficticios locales.
+    }
   }
 
   void _setEnvironment(int index, IntegrationEnvironment environment) {

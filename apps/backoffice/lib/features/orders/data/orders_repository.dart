@@ -1,10 +1,14 @@
 import 'package:ajilimo_shared/ajilimo_shared.dart';
 
+import '../../../core/api/api_client.dart';
 import '../domain/order.dart';
 
-/// Repositorio de órdenes. Fase 3: datos semilla (mock); en producción vendrá
-/// del backend (RappiConnector.getOrders / webhooks).
+/// Repositorio de órdenes. Intenta leer del BFF y cae a datos ficticios locales.
 class OrdersRepository {
+  OrdersRepository({this.api});
+
+  final ApiClient? api;
+
   List<DeliveryOrder> seed(DateTime now) => <DeliveryOrder>[
         DeliveryOrder(
           id: 'R-4821',
@@ -36,4 +40,34 @@ class OrdersRepository {
           takenAt: now.subtract(const Duration(minutes: 24)),
         ),
       ];
+
+  Future<List<DeliveryOrder>> fetchRemote() async {
+    if (api == null) return const <DeliveryOrder>[];
+    final List<Map<String, dynamic>> rows = await api!.getOrders();
+    final DateTime now = DateTime.now();
+    return rows
+        .map(
+          (row) => DeliveryOrder(
+            id: (row['orderId'] ?? '').toString(),
+            channel: _channel(row['channel'] as String?),
+            storeName: (row['storeName'] ?? row['storeId'] ?? '').toString(),
+            items: <String>['${row['itemCount'] ?? 0} ítems'],
+            total: ((row['total'] as num?) ?? 0).toDouble(),
+            status: _status(row['status'] as String?),
+            placedAt: now,
+          ),
+        )
+        .toList();
+  }
+
+  static DeliveryChannel _channel(String? value) => DeliveryChannel.values.firstWhere(
+        (channel) => channel.name == value,
+        orElse: () => DeliveryChannel.rappi,
+      );
+
+  static OrderStatus _status(String? value) => switch (value) {
+        'TAKEN' || 'PREPARING' => OrderStatus.preparing,
+        'READY_FOR_PICKUP' => OrderStatus.ready,
+        _ => OrderStatus.pending,
+      };
 }

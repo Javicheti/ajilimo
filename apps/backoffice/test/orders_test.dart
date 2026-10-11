@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:backoffice/core/api/api_client.dart';
 import 'package:backoffice/features/orders/presentation/orders_page.dart';
+
+import 'support/fake_api.dart';
 
 void main() {
   Widget build() => ProviderScope(
+        overrides: [apiClientProvider.overrideWithValue(FakeApi())],
         child: MaterialApp(
           theme: AppTheme.light(),
           home: const OrdersPage(),

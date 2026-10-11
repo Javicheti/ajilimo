@@ -43,8 +43,12 @@ Stack: **Flutter** (Web + Android) + **Firebase** + **Google Cloud**.
   - **7** **DiDi + Reclamos** (conector, firma MD5, bandeja 24 h).
   - **8** **PedidosYa** + vista unificada (resumen por app).
   - **9** **SaaS** (onboarding de tenants).
-- **Pendientes transversales**: wire UI↔backend real, job Cloud Scheduler, captura real de cámara,
-  y validación en DEV/prod con credenciales de cada plataforma.
+- **Capa de integración (BFF)**: función `api` desplegada (endpoints `/control-tower`,
+  `/orders`, `/claims`, `/connections`) que sirve datos normalizados de los conectores.
+  Torre de control, Órdenes, Reclamos e Integraciones consumen el BFF con **fallback** a datos
+  ficticios locales. Cambiar a datos reales = configurar `RAPPI_BASE_URL`/etc. + secretos.
+- **Pendientes transversales**: secretos reales en Secret Manager, job Cloud Scheduler,
+  captura real de cámara, App Check, entorno `prod`, y validación en DEV con credenciales.
 
 
 ## 3. Alcance funcional

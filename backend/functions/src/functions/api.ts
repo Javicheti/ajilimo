@@ -1,11 +1,14 @@
 import { onRequest } from 'firebase-functions/v2/https';
 
 import { createConnector } from '../connectors/common/factory';
+import { DidiConnector } from '../connectors/didi/didi-connector';
 import { loadIntegrations } from '../config/runtime-config';
 import type { IntegrationConfig } from '../config/types';
 import { buildControlTower, type ChannelStoreInput } from '../domain/control-tower';
+import { buildOrderRows } from '../domain/orders';
 import { isWithinSchedule } from '../domain/schedule';
 import { logger } from '../shared/logger';
+import type { Order } from '../connectors/common/types';
 
 function contextOf(config: IntegrationConfig) {
   return {
@@ -25,7 +28,7 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
   const now = new Date();
 
   try {
-    if (path.includes('/control-tower')) {
+    if (path.endsWith('/control-tower')) {
       const rows: ChannelStoreInput[] = [];
       const channels: Array<{ provider: string; ok: boolean; error?: string }> = [];
 
@@ -58,7 +61,48 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
       return;
     }
 
-    if (path.includes('/connections')) {
+    if (path.endsWith('/orders')) {
+      const entries: Array<{
+        channel: IntegrationConfig['provider'];
+        storeId: string;
+        storeName?: string;
+        order: Order;
+      }> = [];
+      for (const config of loadIntegrations()) {
+        try {
+          const connector = createConnector(config.provider, contextOf(config));
+          const stores = await connector.listStores();
+          for (const store of stores.slice(0, 5)) {
+            const orders = await connector.getOrders(store.storeId).catch(() => []);
+            for (const order of orders) {
+              entries.push({ channel: config.provider, storeId: store.storeId, storeName: store.name, order });
+            }
+          }
+        } catch (error) {
+          logger.warn('Órdenes: canal no disponible', { provider: config.provider, error: String(error) });
+        }
+      }
+      res.status(200).json({ orders: buildOrderRows(entries), generatedAt: now.toISOString() });
+      return;
+    }
+
+    if (path.endsWith('/claims')) {
+      const claims: Array<Record<string, unknown>> = [];
+      for (const config of loadIntegrations()) {
+        if (config.provider !== 'didi') continue;
+        try {
+          const connector = createConnector('didi', contextOf(config)) as DidiConnector;
+          const list = await connector.getClaims();
+          for (const claim of list) claims.push({ ...claim, channel: 'didi' });
+        } catch (error) {
+          logger.warn('Reclamos: canal no disponible', { provider: config.provider, error: String(error) });
+        }
+      }
+      res.status(200).json({ claims, generatedAt: now.toISOString() });
+      return;
+    }
+
+    if (path.endsWith('/connections')) {
       const integrations = loadIntegrations().map((config) => ({
         provider: config.provider,
         environment: config.environment,

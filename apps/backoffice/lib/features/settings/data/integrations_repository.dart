@@ -1,10 +1,14 @@
 import 'package:ajilimo_shared/ajilimo_shared.dart';
 
+import '../../../core/api/api_client.dart';
 import '../domain/integration.dart';
 
-/// Repositorio de integraciones. En Fase 1 usa datos en memoria (seed);
-/// en producción leerá la configuración multi-tenant desde el backend.
+/// Repositorio de integraciones. Intenta leer del BFF y cae a datos ficticios locales.
 class IntegrationsRepository {
+  IntegrationsRepository({this.api});
+
+  final ApiClient? api;
+
   List<Integration> seed() => const <Integration>[
         Integration(
           channel: DeliveryChannel.rappi,
@@ -28,6 +32,39 @@ class IntegrationsRepository {
           credentialsConfigured: false,
         ),
       ];
+
+  Future<List<Integration>> fetchRemote() async {
+    if (api == null) return const <Integration>[];
+    final List<Map<String, dynamic>> rows = await api!.getConnections();
+    return rows
+        .map(
+          (row) => Integration(
+            channel: _channel(row['provider'] as String?),
+            environment: _environment(row['environment'] as String?),
+            baseUrl: (row['baseUrl'] ?? '').toString(),
+            status: _status(row['status'] as String?),
+            credentialsConfigured: row['credentialsConfigured'] == true,
+          ),
+        )
+        .toList();
+  }
+
+  static DeliveryChannel _channel(String? value) => DeliveryChannel.values.firstWhere(
+        (channel) => channel.name == value,
+        orElse: () => DeliveryChannel.rappi,
+      );
+
+  static IntegrationEnvironment _environment(String? value) => switch (value) {
+        'dev' => IntegrationEnvironment.dev,
+        'prod' => IntegrationEnvironment.prod,
+        _ => IntegrationEnvironment.mock,
+      };
+
+  static IntegrationStatus _status(String? value) => switch (value) {
+        'error' => IntegrationStatus.error,
+        'pending_auth' => IntegrationStatus.pendingAuth,
+        _ => IntegrationStatus.connected,
+      };
 
   /// Simula una prueba de conexión. En producción llamará al backend.
   Future<bool> testConnection(Integration integration) async {

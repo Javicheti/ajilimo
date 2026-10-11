@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:backoffice/core/api/api_client.dart';
 import 'package:backoffice/features/settings/presentation/integrations_page.dart';
 
-void main() {
-  setUp(() async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-  });
+import 'support/fake_api.dart';
 
-  testWidgets('Lista los canales configurados', (WidgetTester tester) async {
-    await tester.binding.setSurfaceSize(const Size(1200, 2000));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(
-      ProviderScope(
+void main() {
+  Widget build() => ProviderScope(
+        overrides: [apiClientProvider.overrideWithValue(FakeApi())],
         child: MaterialApp(
           theme: AppTheme.light(),
           home: const IntegrationsPage(),
         ),
-      ),
-    );
+      );
+
+  testWidgets('Lista los canales configurados', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 2000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(build());
 
     expect(find.text('Configuración · Integraciones'), findsOneWidget);
     expect(find.text('Rappi'), findsWidgets);
@@ -32,14 +32,7 @@ void main() {
   testWidgets('Probar conexión en mock responde OK', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(1200, 2000));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          theme: AppTheme.light(),
-          home: const IntegrationsPage(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(build());
 
     await tester.tap(find.text('Probar conexión').first);
     await tester.pump(const Duration(milliseconds: 800));

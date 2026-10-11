@@ -40,6 +40,28 @@ class ApiClient {
     final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
     return (data['integrations'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
+
+  Future<List<Map<String, dynamic>>> getOrders() async {
+    final http.Response response = await _client
+        .get(Uri.parse('$baseUrl/orders'))
+        .timeout(const Duration(seconds: 10));
+    if (response.statusCode != 200) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+    final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['orders'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> getClaims() async {
+    final http.Response response = await _client
+        .get(Uri.parse('$baseUrl/claims'))
+        .timeout(const Duration(seconds: 10));
+    if (response.statusCode != 200) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+    final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['claims'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
 }
 
 final Provider<ApiClient> apiClientProvider = Provider<ApiClient>((ref) => ApiClient());

@@ -37,6 +37,12 @@ test('responder reclamo devuelve accepted', async () => {
   assert.equal(body.accepted, true);
 });
 
+test('lista de reclamos', async () => {
+  const data = await (await fetch(`${baseUrl}/v1/order/claims`)).json();
+  assert.ok(data.claims.length >= 1);
+  assert.equal(data.claims[0].claim_id, 'C-1');
+});
+
 test('firma MD5 = MD5(payload + secret)', () => {
   const payload = '{"order_id":"D-3310"}';
   const expected = createHash('md5').update(`${payload}${DIDI_WEBHOOK_SECRET}`).digest('hex');

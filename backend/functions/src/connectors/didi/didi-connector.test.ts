@@ -66,6 +66,14 @@ test('respondToClaim acepta el reembolso', async () => {
   await connector.respondToClaim('D-3310', { accept: true, note: 'pedido incompleto' });
 });
 
+test('getClaims devuelve reclamos normalizados', async () => {
+  const connector = new DidiConnector(context());
+  const claims = await connector.getClaims();
+  assert.ok(claims.length >= 1);
+  assert.ok(claims[0].claimId);
+  assert.ok(claims[0].createdAt);
+});
+
 test('la factory crea el conector de didi', () => {
   const connector = createConnector('didi', context());
   assert.equal(connector.provider, 'didi');

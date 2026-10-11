@@ -4,6 +4,7 @@ import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/claims_repository.dart';
 import '../domain/claim.dart';
 import 'claims_providers.dart';
 
@@ -21,10 +22,22 @@ class _ClaimsPageState extends ConsumerState<ClaimsPage> {
   @override
   void initState() {
     super.initState();
-    _claims = ref.read(claimsRepositoryProvider).seed(DateTime.now());
+    final ClaimsRepository repository = ref.read(claimsRepositoryProvider);
+    _claims = repository.seed(DateTime.now());
+    _loadRemote(repository);
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _loadRemote(ClaimsRepository repository) async {
+    try {
+      final List<Claim> remote = await repository.fetchRemote();
+      if (!mounted || remote.isEmpty) return;
+      setState(() => _claims = remote);
+    } catch (_) {
+      // Sin BFF disponible: se mantienen los datos ficticios locales.
+    }
   }
 
   @override
