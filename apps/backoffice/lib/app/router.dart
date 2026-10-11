@@ -6,11 +6,14 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/auth_providers.dart';
 import '../features/auth/presentation/login_page.dart';
 import '../features/claims/presentation/claims_page.dart';
+import '../features/connectivity/presentation/connectivity_page.dart';
 import '../features/control_tower/presentation/control_tower_page.dart';
 import '../features/evidence/presentation/evidence_page.dart';
+import '../features/financial/presentation/financial_page.dart';
 import '../features/orders/presentation/orders_page.dart';
 import '../features/promos/presentation/promos_page.dart';
 import '../features/reports/presentation/reports_page.dart';
+import '../features/schedule/presentation/schedule_page.dart';
 import '../features/settings/presentation/integrations_page.dart';
 import '../features/tenants/presentation/tenants_page.dart';
 import '../features/users/domain/app_user.dart';
@@ -80,9 +83,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             AppShellScreen(currentRoute: state.matchedLocation, child: child),
         routes: <RouteBase>[
           GoRoute(path: '/control', name: 'control', pageBuilder: (context, state) => _transition(state, const ControlTowerPage())),
+          GoRoute(path: '/connectivity', name: 'connectivity', pageBuilder: (context, state) => _transition(state, const ConnectivityPage())),
           GoRoute(path: '/orders', name: 'orders', pageBuilder: (context, state) => _transition(state, const OrdersPage())),
+          GoRoute(path: '/schedule', name: 'schedule', pageBuilder: (context, state) => _transition(state, const SchedulePage())),
           GoRoute(path: '/promos', name: 'promos', pageBuilder: (context, state) => _transition(state, const PromosPage())),
           GoRoute(path: '/reports', name: 'reports', pageBuilder: (context, state) => _transition(state, const ReportsPage())),
+          GoRoute(path: '/financial', name: 'financial', pageBuilder: (context, state) => _transition(state, const FinancialPage())),
           GoRoute(path: '/evidence', name: 'evidence', pageBuilder: (context, state) => _transition(state, const EvidencePage())),
           GoRoute(path: '/claims', name: 'claims', pageBuilder: (context, state) => _transition(state, const ClaimsPage())),
           GoRoute(

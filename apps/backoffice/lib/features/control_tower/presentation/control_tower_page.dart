@@ -53,6 +53,18 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
           title: 'Torre de control',
           subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención',
         ),
+        const SectionHeader(title: 'Métricas de servicio', subtitle: 'Últimos 7 días vs. periodo anterior'),
+        Wrap(
+          spacing: Spacing.md,
+          runSpacing: Spacing.md,
+          children: <Widget>[
+            SizedBox(width: 210, child: KpiCard(label: 'Reclamos', value: '33.3%', icon: Icons.gavel_outlined, accent: c.danger, trend: 33.3)),
+            SizedBox(width: 210, child: KpiCard(label: 'Cancelaciones', value: '0%', icon: Icons.cancel_outlined, accent: c.success, trend: 0)),
+            SizedBox(width: 210, child: KpiCard(label: 'Disponibilidad', value: '38.8%', icon: Icons.wifi_tethering, accent: c.warning, trend: -0.8)),
+            SizedBox(width: 210, child: KpiCard(label: 'Espera repartidor', value: '2:21', icon: Icons.timer_outlined, accent: c.info)),
+          ],
+        ),
+        const SizedBox(height: Spacing.lg),
         Wrap(
             spacing: Spacing.md,
             runSpacing: Spacing.md,

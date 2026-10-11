@@ -35,7 +35,7 @@ shared/lib/design/
 | Oscuro | fondo `#0F0F12`, superficie `#1B1B1F`, borde `#2A2A31` |
 
 ## Tipografía
-- **Jost** (geométrica, estilo Futura) para títulos y datos, con **cifras tabulares**.
+- **Roboto** para títulos y datos, con **cifras tabulares**.
 - Fuentes **empaquetadas** en `shared/assets/fonts/` (sin fetch en runtime).
 
 ## Shell y navegación
@@ -56,10 +56,16 @@ La plataforma usa un **AppShell** (`shared/lib/navigation/app_shell.dart`):
   Integraciones, Usuarios, Tenants).
 - **`KpiCard`**: ícono en chip, valor destacado, etiqueta, **chip de tendencia** (↑/↓) y hint.
 
-## Componentes (Fase 0)
-`AppShell`, `NavGroup`/`NavEntry`, `PageHeader`, `EmptyState`, `AppCard`, `StatusChip`,
-`ChannelBadge`, `KpiCard`, `SectionHeader`; **gráficos** con `fl_chart` (Reportes).
-Galería viva en la ruta **`/design`**.
+## Páginas (paridad con back-office delivery)
+Operación: **Torre de control** (KPIs + métricas de servicio con deltas), **Conectividad**
+(estado en tiempo real + abrir/cerrar masivo), **Órdenes**, **Horarios** (editor semanal + festivos),
+**Promos y sabores**. Defensa: **Reclamos**, **Evidencia (KORN)**. Analítica: **Reportes**
+(gráficos), **Financiero** (pagos/conciliación). Configuración: Integraciones, Usuarios, Tenants.
+
+## Componentes (Fase 1)
+`AppShell`, `NavGroup`/`NavEntry`, `PageHeader`, `FilterBar`, `DataTableCard`, `EmptyState`,
+`AppCard`, `StatusChip`, `ChannelBadge`, `KpiCard` (con tendencia), `SectionHeader`;
+gráficos con `fl_chart`. Galería viva en la ruta **`/design`**.
 
 Componentes previstos: `DataTable`, `AlertFeed`, `CountdownTimer` (24 h), `EvidenceViewer`,
 `ScheduleEditor`, `FilterBar`, `EmptyState`, `SkeletonLoader`, `Chart`.

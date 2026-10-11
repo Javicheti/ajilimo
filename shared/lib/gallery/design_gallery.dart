@@ -110,17 +110,17 @@ class _TypographyShowcase extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Display · Jost', style: t.displayMedium),
+        Text('Display · Roboto', style: t.displayMedium),
         const SizedBox(height: Spacing.xs),
-        Text('Headline · Jost', style: t.headlineMedium),
+        Text('Headline · Roboto', style: t.headlineMedium),
         const SizedBox(height: Spacing.xs),
-        Text('Title · Jost', style: t.titleLarge),
+        Text('Title · Roboto', style: t.titleLarge),
         const SizedBox(height: Spacing.sm),
-        Text('Body · Jost con cifras tabulares — S/ 12,340.50', style: t.bodyLarge),
+        Text('Body · Roboto con cifras tabulares — S/ 12,340.50', style: t.bodyLarge),
         const SizedBox(height: Spacing.xxs),
-        Text('Body small · Jost — texto secundario', style: t.bodySmall),
+        Text('Body small · Roboto — texto secundario', style: t.bodySmall),
         const SizedBox(height: Spacing.xxs),
-        Text('Label · Jost — 0123456789', style: t.labelMedium),
+        Text('Label · Roboto — 0123456789', style: t.labelMedium),
       ],
     );
   }
