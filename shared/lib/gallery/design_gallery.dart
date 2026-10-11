@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../design/semantic_colors.dart';
 import '../design/tokens.dart';
+import '../branding/app_logo.dart';
 import '../models/delivery.dart';
 import '../widgets/app_card.dart';
 import '../widgets/channel_badge.dart';
@@ -18,14 +19,27 @@ class DesignGalleryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(Spacing.lg),
-      children: const <Widget>[
-        PageHeader(title: 'Design System — AjíLimo', subtitle: 'Tokens, componentes y tipografía'),
-        _Section(title: 'Estados de tienda', child: _StatusRow()),
-        _Section(title: 'Canales', child: _ChannelRow()),
-        _Section(title: 'KPIs', child: _KpiRow()),
-        _Section(title: 'Tipografía', child: _TypographyShowcase()),
-        _Section(title: 'Colores semánticos', child: _ColorShowcase()),
-        _Section(title: 'Botones y campos', child: _ControlsShowcase()),
+      children: <Widget>[
+        const PageHeader(title: 'Design System — AjíLimo', subtitle: 'Tokens, componentes y tipografía'),
+        _Section(
+          title: 'Marca',
+          child: Wrap(
+            spacing: Spacing.lg,
+            runSpacing: Spacing.md,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              AppLogo(size: 32),
+              AppLogo(size: 48),
+              AppLogo(size: 48, showWordmark: true, wordmarkColor: context.colors.textStrong),
+            ],
+          ),
+        ),
+        const _Section(title: 'Estados de tienda', child: _StatusRow()),
+        const _Section(title: 'Canales', child: _ChannelRow()),
+        const _Section(title: 'KPIs', child: _KpiRow()),
+        const _Section(title: 'Tipografía', child: _TypographyShowcase()),
+        const _Section(title: 'Colores semánticos', child: _ColorShowcase()),
+        const _Section(title: 'Botones y campos', child: _ControlsShowcase()),
       ],
     );
   }

@@ -22,17 +22,26 @@ shared/lib/design/
 - Los widgets usan **roles** vía `context.colors`, nunca primitivos.
 
 ## Paleta
+Tomada del **logo AjíLimo** (ají rojo, lima, ola teal, crema, marrón):
+
 | Rol | Valor |
 |---|---|
-| Marca (primario) | `#FF441F` (hover `#E63A17`, soft `#FFE8E0`) |
-| Éxito/Abierto | `#00C48C` |
-| Alerta/Pausado | `#FFB020` |
-| Peligro/Cerrado | `#FF3B30` |
+| Marca (primario · ají rojo) | `#C6362A` (hover `#A82A20`, soft `#FBE9E5`) |
+| Marrón (tipografía del logo) | `#7A1F1F` |
+| Lima (éxito) | `#7FA82E` |
+| Teal (info · ola) | `#2E8B8B` |
+| Naranja ají (alerta) | `#E8952A` |
+| Peligro | `#E5484D` |
 | Suspendido | `#7C3AED` |
-| Info | `#3B82F6` |
 | Canales | Rappi `#FF441F` · DiDi `#FF8A00` · PedidosYa `#E5004D` |
 | Superficie/Fondo/Borde | `#FFFFFF` / `#F7F7F8` / `#E6E6EA` |
-| Oscuro | fondo `#0F0F12`, superficie `#1B1B1F`, borde `#2A2A31` |
+
+## Marca / logo
+- `AppLogo` (`shared/lib/branding/app_logo.dart`): emblema circular (ají + lima + ola)
+  pintado en código, con **wordmark** opcional. Escala vía `FittedBox`.
+- Ubicado en: **header** (expandido/rail), **drawer**, **login** (centrado, grande) y
+  app **KORN** (AppBar) + galería `/design`.
+- Para usar el PNG oficial: colocar en `apps/backoffice/assets/brand/logo.png`.
 
 ## Tipografía
 - **Roboto** para títulos y datos, con **cifras tabulares**.

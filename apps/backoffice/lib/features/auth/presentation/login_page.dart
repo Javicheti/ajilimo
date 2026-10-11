@@ -95,21 +95,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: c.brandPrimary,
-                          borderRadius: BorderRadius.circular(Radii.md),
-                        ),
-                      ),
-                      const SizedBox(width: Spacing.sm),
-                      Text('AjíLimo', style: Theme.of(context).textTheme.headlineMedium),
-                    ],
+                  Center(child: AppLogo(size: 64, showWordmark: true, wordmarkColor: c.textStrong)),
+                  const SizedBox(height: Spacing.xs),
+                  Center(
+                    child: Text(
+                      'Centro de control de delivery',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.textMid),
+                    ),
                   ),
-                  const SizedBox(height: Spacing.sm),
+                  const SizedBox(height: Spacing.lg),
                   Text(
                     _registering ? 'Crea tu cuenta' : 'Inicia sesión',
                     style: Theme.of(context).textTheme.titleMedium,

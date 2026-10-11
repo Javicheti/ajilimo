@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(build());
     await tester.pumpAndSettle();
 
-    expect(find.text('AjíLimo'), findsOneWidget);
+    expect(find.text('AJÍ LIMO'), findsOneWidget);
     expect(find.text('Torre de control'), findsWidgets);
     expect(find.text('Reportes'), findsOneWidget);
   });

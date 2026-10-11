@@ -1,6 +1,7 @@
 /// AjíLimo — paquete compartido (design system, widgets y modelos).
 library;
 
+export 'branding/app_logo.dart';
 export 'design/design.dart';
 export 'gallery/design_gallery.dart';
 export 'models/delivery.dart';

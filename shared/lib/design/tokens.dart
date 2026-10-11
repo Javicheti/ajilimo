@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 class Palette {
   const Palette._();
 
-  static const Color orange = Color(0xFFFF441F);
-  static const Color orangeHover = Color(0xFFE63A17);
-  static const Color peach = Color(0xFFFFE8E0);
+  // Marca (tomada del logo AjíLimo)
+  static const Color orange = Color(0xFFC6362A); // ají rojo
+  static const Color orangeHover = Color(0xFFA82A20);
+  static const Color peach = Color(0xFFFBE9E5); // crema rosado
+  static const Color maroon = Color(0xFF7A1F1F); // tipografía del logo
+  static const Color lime = Color(0xFF7FA82E); // lima/limón
+  static const Color teal = Color(0xFF2E8B8B); // ola
 
   static const Color carbon = Color(0xFF16161A);
   static const Color ink = Color(0xFF1B1B1F);
@@ -18,11 +22,11 @@ class Palette {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color background = Color(0xFFF7F7F8);
 
-  static const Color success = Color(0xFF00C48C);
-  static const Color warning = Color(0xFFFFB020);
-  static const Color danger = Color(0xFFFF3B30);
+  static const Color success = Color(0xFF7FA82E); // lima
+  static const Color warning = Color(0xFFE8952A); // naranja del ají
+  static const Color danger = Color(0xFFE5484D);
   static const Color suspended = Color(0xFF7C3AED);
-  static const Color info = Color(0xFF3B82F6);
+  static const Color info = Color(0xFF2E8B8B); // teal
 
   static const Color channelRappi = Color(0xFFFF441F);
   static const Color channelDidi = Color(0xFFFF8A00);

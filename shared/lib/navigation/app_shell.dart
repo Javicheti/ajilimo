@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Durations;
 
+import '../branding/app_logo.dart';
 import '../design/brand.dart';
 import '../design/semantic_colors.dart';
 import '../design/tokens.dart';
@@ -92,7 +93,7 @@ class AppShell extends StatelessWidget {
             width: 268,
             child: Column(
               children: <Widget>[
-                _DrawerHeader(brand: brand),
+                const _DrawerHeader(),
                 Expanded(
                   child: _Sidebar(
                     expanded: true,
@@ -202,19 +203,12 @@ class _Header extends StatelessWidget {
                 children: <Widget>[
                   if (showMenu)
                     IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
-                  else ...<Widget>[
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(color: brand.primary, borderRadius: BorderRadius.circular(Radii.sm)),
-                      alignment: Alignment.center,
-                      child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                  else
+                    AppLogo(
+                      size: 34,
+                      showWordmark: leftWidth > 100,
+                      wordmarkColor: c.textStrong,
                     ),
-                    if (leftWidth > 100) ...<Widget>[
-                      const SizedBox(width: Spacing.sm),
-                      const Text('AjíLimo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.3)),
-                    ],
-                  ],
                 ],
               ),
             ),
@@ -360,8 +354,7 @@ class _UserMenu extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _DrawerHeader extends StatelessWidget {
-  const _DrawerHeader({required this.brand});
-  final BrandPalette brand;
+  const _DrawerHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -369,19 +362,7 @@ class _DrawerHeader extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),
-        child: Row(
-          children: <Widget>[
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(color: brand.primary, borderRadius: BorderRadius.circular(Radii.sm)),
-              alignment: Alignment.center,
-              child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-            ),
-            const SizedBox(width: Spacing.sm),
-            const Text('AjíLimo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-          ],
-        ),
+        child: AppLogo(size: 34, showWordmark: true, wordmarkColor: context.colors.textStrong),
       ),
     );
   }

@@ -69,7 +69,13 @@ class _KornCapturePageState extends State<KornCapturePage> {
     final AppColors c = context.colors;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KORN · Evidencia del pedido'),
+        title: Row(
+          children: <Widget>[
+            const AppLogo(size: 28, wordmarkColor: Colors.white),
+            const SizedBox(width: Spacing.sm),
+            const Text('KORN · Evidencia del pedido'),
+          ],
+        ),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: Spacing.md),
