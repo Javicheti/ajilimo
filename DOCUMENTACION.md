@@ -145,4 +145,5 @@ Detalle: `docs/roadmap.md`.
 | `docs/configuration.md` | Configuración dinámica |
 | `docs/multitenant-secrets.md` | SaaS y secretos |
 | `docs/testing-strategy.md` | Pruebas |
+| `docs/rbac.md` | Usuarios, roles y permisos |
 | `AGENTS.md` | Reglas operativas (cuentas, deploy) |

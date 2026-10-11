@@ -14,44 +14,53 @@ import '../features/promos/presentation/promos_page.dart';
 import '../features/reports/presentation/reports_page.dart';
 import '../features/settings/presentation/integrations_page.dart';
 import '../features/tenants/presentation/tenants_page.dart';
+import '../features/users/domain/app_user.dart';
+import '../features/users/domain/user_role.dart';
+import '../features/users/presentation/user_providers.dart';
+import '../features/users/presentation/users_page.dart';
 
 class _AuthRefresh extends ChangeNotifier {
   void refresh() => notifyListeners();
 }
 
-/// Router de la app, con redirección a `/login` cuando no hay sesión.
+/// Router de la app, con redirección a `/login` cuando no hay sesión y
+/// protección de rutas según permisos.
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   final _AuthRefresh refresh = _AuthRefresh();
   ref.onDispose(refresh.dispose);
   ref.listen<AsyncValue<bool>>(authStatusProvider, (_, _) => refresh.refresh());
+  ref.listen<AsyncValue<AppUser?>>(currentUserProvider, (_, _) => refresh.refresh());
 
   return GoRouter(
     initialLocation: '/',
     refreshListenable: refresh,
     redirect: (context, state) {
-      // Sin Firebase (tests) se asume con sesión para no bloquear.
       final bool signedIn = ref.read(authStatusProvider).value ?? true;
-      final bool atLogin = state.matchedLocation == '/login';
+      final String location = state.matchedLocation;
+      final bool atLogin = location == '/login';
+
       if (!signedIn) return atLogin ? null : '/login';
       if (signedIn && atLogin) return '/';
+
+      final AppUser? user = ref.read(currentUserProvider).value;
+      if (user != null) {
+        if (location.startsWith('/settings/users') && !user.role.can(Permission.manageUsers)) {
+          return '/';
+        }
+        if (location.startsWith('/settings/tenants') && !user.role.can(Permission.manageTenants)) {
+          return '/';
+        }
+      }
       return null;
     },
     routes: <RouteBase>[
       GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/', name: 'home', builder: (context, state) => const HomePage()),
-      GoRoute(
-        path: '/control',
-        name: 'control',
-        builder: (context, state) => const ControlTowerPage(),
-      ),
+      GoRoute(path: '/control', name: 'control', builder: (context, state) => const ControlTowerPage()),
       GoRoute(path: '/orders', name: 'orders', builder: (context, state) => const OrdersPage()),
       GoRoute(path: '/promos', name: 'promos', builder: (context, state) => const PromosPage()),
       GoRoute(path: '/reports', name: 'reports', builder: (context, state) => const ReportsPage()),
-      GoRoute(
-        path: '/evidence',
-        name: 'evidence',
-        builder: (context, state) => const EvidencePage(),
-      ),
+      GoRoute(path: '/evidence', name: 'evidence', builder: (context, state) => const EvidencePage()),
       GoRoute(path: '/claims', name: 'claims', builder: (context, state) => const ClaimsPage()),
       GoRoute(
         path: '/settings/integrations',
@@ -59,15 +68,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const IntegrationsPage(),
       ),
       GoRoute(
+        path: '/settings/users',
+        name: 'users',
+        builder: (context, state) => const UsersPage(),
+      ),
+      GoRoute(
         path: '/settings/tenants',
         name: 'tenants',
         builder: (context, state) => const TenantsPage(),
       ),
-      GoRoute(
-        path: '/design',
-        name: 'design',
-        builder: (context, state) => const DesignGalleryPage(),
-      ),
+      GoRoute(path: '/design', name: 'design', builder: (context, state) => const DesignGalleryPage()),
     ],
   );
 });

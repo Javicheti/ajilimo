@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../auth/presentation/auth_providers.dart';
+import '../../users/domain/user_role.dart';
+import '../../users/presentation/user_providers.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -11,6 +13,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppColors c = context.colors;
+    final UserRole role = ref.watch(currentRoleProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('AjíLimo'),
@@ -76,11 +79,18 @@ class HomePage extends ConsumerWidget {
                       icon: const Icon(Icons.hub_outlined),
                       label: const Text('Integraciones'),
                     ),
-                    OutlinedButton.icon(
-                      onPressed: () => context.go('/settings/tenants'),
-                      icon: const Icon(Icons.add_business_outlined),
-                      label: const Text('Tenants'),
-                    ),
+                    if (role.can(Permission.manageUsers))
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/settings/users'),
+                        icon: const Icon(Icons.manage_accounts_outlined),
+                        label: const Text('Usuarios'),
+                      ),
+                    if (role.can(Permission.manageTenants))
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/settings/tenants'),
+                        icon: const Icon(Icons.add_business_outlined),
+                        label: const Text('Tenants'),
+                      ),
                     OutlinedButton.icon(
                       onPressed: () => context.go('/control'),
                       icon: const Icon(Icons.dashboard_outlined),

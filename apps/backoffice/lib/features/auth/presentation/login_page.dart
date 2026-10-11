@@ -1,7 +1,12 @@
 import 'package:ajilimo_shared/ajilimo_shared.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../tenants/domain/tenant.dart';
+import '../../users/domain/app_user.dart';
+import '../../users/domain/user_role.dart';
+import '../../users/presentation/user_providers.dart';
 import '../data/auth_service.dart';
 import 'auth_providers.dart';
 
@@ -15,6 +20,9 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _phone = TextEditingController();
+  final TextEditingController _organization = TextEditingController();
   bool _registering = false;
   bool _loading = false;
   String? _error;
@@ -23,6 +31,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _name.dispose();
+    _phone.dispose();
+    _organization.dispose();
     super.dispose();
   }
 
@@ -36,13 +47,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       setState(() => _error = 'Ingresa correo y contraseña.');
       return;
     }
+    if (_registering && _name.text.trim().isEmpty) {
+      setState(() => _error = 'Ingresa tu nombre.');
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
       if (_registering) {
-        await service.signUp(_email.text, _password.text);
+        final User user = await service.signUp(_email.text, _password.text);
+        final String tenantSlug = slugify(_organization.text);
+        final AppUser profile = AppUser(
+          uid: user.uid,
+          email: user.email ?? _email.text.trim(),
+          displayName: _name.text.trim(),
+          phone: _phone.text.trim().isEmpty ? null : _phone.text.trim(),
+          tenantId: tenantSlug.isEmpty ? 'ajilimo' : tenantSlug,
+          role: UserRole.viewer,
+          createdAt: DateTime.now(),
+          createdBy: user.uid,
+        );
+        await ref.read(userRepositoryProvider).upsert(profile);
       } else {
         await service.signIn(_email.text, _password.text);
       }
@@ -62,7 +89,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(Spacing.lg),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 440),
             child: AppCard(
               padding: const EdgeInsets.all(Spacing.xl),
               child: Column(
@@ -88,6 +115,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: Spacing.lg),
+                  if (_registering) ...<Widget>[
+                    TextField(
+                      controller: _name,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: const InputDecoration(labelText: 'Nombre completo'),
+                    ),
+                    const SizedBox(height: Spacing.md),
+                    TextField(
+                      controller: _organization,
+                      decoration: const InputDecoration(
+                        labelText: 'Organización / negocio',
+                        hintText: 'Ej. PINWINGS',
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.md),
+                    TextField(
+                      controller: _phone,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(labelText: 'Teléfono (opcional)'),
+                    ),
+                    const SizedBox(height: Spacing.md),
+                  ],
                   TextField(
                     controller: _email,
                     keyboardType: TextInputType.emailAddress,

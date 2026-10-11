@@ -11,8 +11,11 @@ class AuthService {
   Future<void> signIn(String email, String password) =>
       _auth.signInWithEmailAndPassword(email: email.trim(), password: password);
 
-  Future<void> signUp(String email, String password) =>
-      _auth.createUserWithEmailAndPassword(email: email.trim(), password: password);
+  Future<User> signUp(String email, String password) async {
+    final UserCredential credential =
+        await _auth.createUserWithEmailAndPassword(email: email.trim(), password: password);
+    return credential.user!;
+  }
 
   Future<void> signOut() => _auth.signOut();
 }

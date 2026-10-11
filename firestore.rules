@@ -1,47 +1,42 @@
 rules_version = '2';
 
-// AjíLimo · Reglas base de Firestore (tenant-aware, deny-by-default).
-// El acceso se resuelve por custom claims: request.auth.token.tenants = { [tenantId]: rol }
-// y request.auth.token.admin == true para super administradores.
-// NOTA: esquema provisional de Fase 0; se ajustará por módulo.
+// AjíLimo · Reglas de Firestore con RBAC por custom claims:
+//   request.auth.token.role     → owner | superadmin | admin | supervisor | operator | viewer
+//   request.auth.token.tenantId → negocio/organización
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function signedIn() {
-      return request.auth != null;
-    }
+    function signedIn() { return request.auth != null; }
+    function role() { return request.auth.token.role; }
+    function tenant() { return request.auth.token.tenantId; }
+    function isOwnerOrSuper() { return role() in ['owner', 'superadmin']; }
+    function isAdmin() { return role() == 'admin'; }
+    function manager() { return isOwnerOrSuper() || isAdmin(); }
+    function sameTenant(t) { return signedIn() && tenant() == t; }
 
-    function isSuperAdmin() {
-      return signedIn() && request.auth.token.admin == true;
-    }
-
-    function hasTenantAccess(tenantId) {
-      return isSuperAdmin() ||
-        (signedIn() &&
-          request.auth.token.tenants != null &&
-          request.auth.token.tenants[tenantId] != null);
-    }
-
-    function canEdit(tenantId) {
-      return isSuperAdmin() ||
-        (signedIn() &&
-          request.auth.token.tenants != null &&
-          request.auth.token.tenants[tenantId] in ['owner', 'admin', 'supervisor']);
-    }
-
-    // Perfil del propio usuario.
+    // Perfil de usuario.
     match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read: if signedIn() && (
+        request.auth.uid == uid ||
+        (manager() && sameTenant(resource.data.tenantId))
+      );
+      allow create: if signedIn() && request.auth.uid == uid;
+      // No puede cambiarse el propio rol; un manager sí puede gestionar los de su tenant.
+      allow update: if signedIn() && (
+        (request.auth.uid == uid && request.resource.data.role == resource.data.role) ||
+        (manager() && sameTenant(resource.data.tenantId))
+      );
+      allow delete: if isOwnerOrSuper();
     }
 
-    // Raíz multi-tenant: todo lo demás cuelga de /tenants/{tenantId}/...
+    // Datos multi-tenant.
     match /tenants/{tenantId} {
-      allow read: if hasTenantAccess(tenantId);
-      allow write: if canEdit(tenantId);
+      allow read: if isOwnerOrSuper() || sameTenant(tenantId);
+      allow write: if isOwnerOrSuper() || (isAdmin() && sameTenant(tenantId));
 
       match /{document=**} {
-        allow read: if hasTenantAccess(tenantId);
-        allow write: if canEdit(tenantId);
+        allow read: if isOwnerOrSuper() || sameTenant(tenantId);
+        allow write: if isOwnerOrSuper() || (isAdmin() && sameTenant(tenantId));
       }
     }
 
