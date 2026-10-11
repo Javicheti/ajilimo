@@ -51,6 +51,7 @@ class AppShellScreen extends ConsumerWidget {
           NavEntry(route: '/connectivity', label: 'Conectividad', icon: Icons.wifi_tethering),
           NavEntry(route: '/orders', label: 'Órdenes', icon: Icons.receipt_long_outlined),
           NavEntry(route: '/schedule', label: 'Horarios', icon: Icons.schedule_outlined),
+          NavEntry(route: '/menu', label: 'Menú/Carta', icon: Icons.menu_book_outlined),
           NavEntry(route: '/promos', label: 'Promos y sabores', icon: Icons.local_offer_outlined),
         ],
       ),
@@ -92,6 +93,7 @@ class AppShellScreen extends ConsumerWidget {
     if (route.startsWith('/connectivity')) return 'Conectividad';
     if (route.startsWith('/orders')) return 'Órdenes';
     if (route.startsWith('/schedule')) return 'Horarios';
+    if (route.startsWith('/menu')) return 'Menú/Carta';
     if (route.startsWith('/promos')) return 'Promos y sabores';
     if (route.startsWith('/claims')) return 'Reclamos';
     if (route.startsWith('/evidence')) return 'Evidencia';

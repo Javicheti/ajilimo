@@ -46,11 +46,11 @@ config (`RAPPI_BASE_URL`, `DIDI_BASE_URL`, `PEDIDOSYA_BASE_URL`) y el backend de
 
 ## Estado
 - ✅ `shared`: 5 tests.
-- ✅ `apps/backoffice`: 37 tests + `flutter build web`.
+- ✅ `apps/backoffice`: 38 tests + `flutter build web`.
 - ✅ `apps/korn_tablet`: 3 tests.
 - ✅ `mocks/mock-rappi`: 6 · `mocks/mock-didi`: 5 · `mocks/mock-pedidosya`: 2.
 - ✅ `backend/functions`: 58 tests (conectores, config, seguridad, dominio, BFF, admin) + `tsc`.
 - ✅ Funciones desplegadas en `ajilimo-830ca`: `health`, `rappiWebhook`, `api`, `bootstrapOwner`, `setUserRole`.
 - ✅ BFF verificado end-to-end contra los mocks (torre, órdenes, reclamos, conexiones).
-- **Total: 116 tests.**
+- **Total: 117 tests.**
 

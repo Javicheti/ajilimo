@@ -5,7 +5,8 @@ import '../design/semantic_colors.dart';
 import '../design/tokens.dart';
 import 'nav.dart';
 
-/// Shell de la plataforma: barra de navegación vertical + topbar + contenido.
+/// Shell de la plataforma: header (marca + país/notificaciones/usuario) +
+/// sidebar vertical claro con ítem activo tipo pill + contenido.
 class AppShell extends StatelessWidget {
   const AppShell({
     super.key,
@@ -21,6 +22,8 @@ class AppShell extends StatelessWidget {
     this.darkMode = false,
     this.notifications = 0,
     this.brand = BrandPalette.ajiLimo,
+    this.countryLabel = 'Perú',
+    this.version = 'v.1.0.0',
   });
 
   final String title;
@@ -35,6 +38,8 @@ class AppShell extends StatelessWidget {
   final bool darkMode;
   final int notifications;
   final BrandPalette brand;
+  final String countryLabel;
+  final String version;
 
   @override
   Widget build(BuildContext context) {
@@ -43,34 +48,35 @@ class AppShell extends StatelessWidget {
         final double width = constraints.maxWidth;
         final bool expanded = width >= 1080;
         final bool rail = width >= 720 && width < 1080;
+        final double sidebarWidth = expanded ? 256 : 76;
 
         if (expanded || rail) {
           return Scaffold(
-            body: Row(
+            body: Column(
               children: <Widget>[
-                _Sidebar(
-                  expanded: expanded,
-                  groups: groups,
-                  currentRoute: currentRoute,
-                  onNavigate: onNavigate,
+                _Header(
+                  leftWidth: sidebarWidth,
+                  brand: brand,
                   userName: userName,
                   userRoleLabel: userRoleLabel,
-                  onLogout: onLogout,
-                  onToggleTheme: onToggleTheme,
+                  notifications: notifications,
+                  countryLabel: countryLabel,
                   darkMode: darkMode,
-                  brand: brand,
+                  onToggleTheme: onToggleTheme,
+                  onLogout: onLogout,
+                  showMenu: false,
                 ),
                 Expanded(
-                  child: Column(
+                  child: Row(
                     children: <Widget>[
-                      _TopBar(
-                        title: title,
-                        notifications: notifications,
-                        userName: userName,
-                        onToggleTheme: onToggleTheme,
-                        darkMode: darkMode,
-                        onLogout: onLogout,
-                        showMenu: false,
+                      _Sidebar(
+                        expanded: expanded,
+                        groups: groups,
+                        currentRoute: currentRoute,
+                        onNavigate: onNavigate,
+                        version: version,
+                        countryLabel: countryLabel,
+                        brand: brand,
                       ),
                       Expanded(child: _Content(child: child)),
                     ],
@@ -84,28 +90,36 @@ class AppShell extends StatelessWidget {
         return Scaffold(
           drawer: Drawer(
             width: 268,
-            child: _Sidebar(
-              expanded: true,
-              groups: groups,
-              currentRoute: currentRoute,
-              onNavigate: onNavigate,
-              userName: userName,
-              userRoleLabel: userRoleLabel,
-              onLogout: onLogout,
-              onToggleTheme: onToggleTheme,
-              darkMode: darkMode,
-              brand: brand,
+            child: Column(
+              children: <Widget>[
+                _DrawerHeader(brand: brand),
+                Expanded(
+                  child: _Sidebar(
+                    expanded: true,
+                    groups: groups,
+                    currentRoute: currentRoute,
+                    onNavigate: onNavigate,
+                    version: version,
+                    countryLabel: countryLabel,
+                    brand: brand,
+                    embedded: true,
+                  ),
+                ),
+              ],
             ),
           ),
           body: Builder(
             builder: (context) => Column(
               children: <Widget>[
-                _TopBar(
-                  title: title,
-                  notifications: notifications,
+                _Header(
+                  leftWidth: 76,
+                  brand: brand,
                   userName: userName,
-                  onToggleTheme: onToggleTheme,
+                  userRoleLabel: userRoleLabel,
+                  notifications: notifications,
+                  countryLabel: countryLabel,
                   darkMode: darkMode,
+                  onToggleTheme: onToggleTheme,
                   onLogout: onLogout,
                   showMenu: true,
                   onMenu: () => Scaffold.of(context).openDrawer(),
@@ -139,8 +153,239 @@ class _Content extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.leftWidth,
+    required this.brand,
+    required this.userName,
+    required this.userRoleLabel,
+    required this.notifications,
+    required this.countryLabel,
+    required this.darkMode,
+    this.onToggleTheme,
+    this.onLogout,
+    this.showMenu = false,
+    this.onMenu,
+  });
+
+  final double leftWidth;
+  final BrandPalette brand;
+  final String userName;
+  final String userRoleLabel;
+  final int notifications;
+  final String countryLabel;
+  final bool darkMode;
+  final VoidCallback? onToggleTheme;
+  final VoidCallback? onLogout;
+  final bool showMenu;
+  final VoidCallback? onMenu;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    return Container(
+      height: 64,
+      decoration: BoxDecoration(
+        color: c.surface,
+        border: Border(bottom: BorderSide(color: c.border)),
+      ),
+      child: Row(
+        children: <Widget>[
+          SizedBox(
+            width: leftWidth,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
+              child: Row(
+                children: <Widget>[
+                  if (showMenu)
+                    IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
+                  else ...<Widget>[
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(color: brand.primary, borderRadius: BorderRadius.circular(Radii.sm)),
+                      alignment: Alignment.center,
+                      child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                    ),
+                    if (leftWidth > 100) ...<Widget>[
+                      const SizedBox(width: Spacing.sm),
+                      const Text('AjíLimo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.3)),
+                    ],
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: Spacing.lg),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: Spacing.lg),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  _CountryChip(countryLabel: countryLabel),
+                  const SizedBox(width: Spacing.sm),
+                  _NotificationsButton(count: notifications),
+                  const SizedBox(width: Spacing.sm),
+                  _UserMenu(
+                    userName: userName,
+                    userRoleLabel: userRoleLabel,
+                    darkMode: darkMode,
+                    onToggleTheme: onToggleTheme,
+                    onLogout: onLogout,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CountryChip extends StatelessWidget {
+  const _CountryChip({required this.countryLabel});
+  final String countryLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: Spacing.xs),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: c.border),
+      ),
+      child: Row(
+        children: <Widget>[
+          const Text('🇵🇪', style: TextStyle(fontSize: 16)),
+          const SizedBox(width: Spacing.xs),
+          Text(countryLabel, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(width: 2),
+          Icon(Icons.expand_more, size: 18, color: c.textMid),
+        ],
+      ),
+    );
+  }
+}
+
+class _NotificationsButton extends StatelessWidget {
+  const _NotificationsButton({required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_outlined)),
+        if (count > 0)
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(color: c.danger, borderRadius: BorderRadius.circular(Radii.pill)),
+              child: Text(
+                '$count',
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _UserMenu extends StatelessWidget {
+  const _UserMenu({
+    required this.userName,
+    required this.userRoleLabel,
+    required this.darkMode,
+    this.onToggleTheme,
+    this.onLogout,
+  });
+
+  final String userName;
+  final String userRoleLabel;
+  final bool darkMode;
+  final VoidCallback? onToggleTheme;
+  final VoidCallback? onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    final String initial = userName.trim().isNotEmpty ? userName.trim()[0].toUpperCase() : '?';
+    return PopupMenuButton<String>(
+      tooltip: 'Cuenta',
+      onSelected: (value) {
+        if (value == 'logout') onLogout?.call();
+        if (value == 'theme') onToggleTheme?.call();
+      },
+      itemBuilder: (context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(enabled: false, child: Text(userRoleLabel)),
+        if (onToggleTheme != null)
+          PopupMenuItem<String>(value: 'theme', child: Text(darkMode ? 'Modo claro' : 'Modo oscuro')),
+        if (onLogout != null) const PopupMenuItem<String>(value: 'logout', child: Text('Cerrar sesión')),
+      ],
+      child: Row(
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(userName, style: Theme.of(context).textTheme.titleSmall),
+              Text('⭐ $userRoleLabel', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: c.textMid)),
+            ],
+          ),
+          const SizedBox(width: Spacing.sm),
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: c.brandPrimary,
+            child: Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Sidebar
 // ---------------------------------------------------------------------------
+
+class _DrawerHeader extends StatelessWidget {
+  const _DrawerHeader({required this.brand});
+  final BrandPalette brand;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: brand.primary, borderRadius: BorderRadius.circular(Radii.sm)),
+              alignment: Alignment.center,
+              child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            ),
+            const SizedBox(width: Spacing.sm),
+            const Text('AjíLimo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _Sidebar extends StatelessWidget {
   const _Sidebar({
@@ -148,54 +393,48 @@ class _Sidebar extends StatelessWidget {
     required this.groups,
     required this.currentRoute,
     required this.onNavigate,
-    required this.userName,
-    required this.userRoleLabel,
+    required this.version,
+    required this.countryLabel,
     required this.brand,
-    this.onLogout,
-    this.onToggleTheme,
-    this.darkMode = false,
+    this.embedded = false,
   });
 
   final bool expanded;
   final List<NavGroup> groups;
   final String currentRoute;
   final ValueChanged<String> onNavigate;
-  final String userName;
-  final String userRoleLabel;
+  final String version;
+  final String countryLabel;
   final BrandPalette brand;
-  final VoidCallback? onLogout;
-  final VoidCallback? onToggleTheme;
-  final bool darkMode;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
-    const Color sidebarBg = Color(0xFF141418);
-    const Color itemIdle = Color(0xFFB4B4BE);
-    const Color sectionLabel = Color(0xFF6B6B78);
-
+    final AppColors c = context.colors;
     return Container(
-      width: expanded ? 248 : 76,
-      color: sidebarBg,
+      width: expanded ? 256 : 76,
+      decoration: BoxDecoration(
+        color: c.surface,
+        border: embedded ? null : Border(right: BorderSide(color: c.border)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _Brand(expanded: expanded, brand: brand),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
+              padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
               children: <Widget>[
                 for (final NavGroup group in groups) ...<Widget>[
                   if (expanded)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.md, Spacing.lg, Spacing.xxs),
+                      padding: const EdgeInsets.fromLTRB(Spacing.md, Spacing.md, Spacing.md, Spacing.xxs),
                       child: Text(
                         group.label.toUpperCase(),
-                        style: const TextStyle(
-                          color: sectionLabel,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: c.textFaint,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                            ),
                       ),
                     )
                   else
@@ -205,7 +444,6 @@ class _Sidebar extends StatelessWidget {
                       entry: entry,
                       expanded: expanded,
                       active: currentRoute == entry.route,
-                      idleColor: itemIdle,
                       accent: brand.primary,
                       onTap: () {
                         onNavigate(entry.route);
@@ -218,48 +456,19 @@ class _Sidebar extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFF26262E)),
-          _UserCard(
-            expanded: expanded,
-            userName: userName,
-            userRoleLabel: userRoleLabel,
-            accent: brand.primary,
-            darkMode: darkMode,
-            onToggleTheme: onToggleTheme,
-            onLogout: onLogout,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Brand extends StatelessWidget {
-  const _Brand({required this.expanded, required this.brand});
-  final bool expanded;
-  final BrandPalette brand;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(expanded ? Spacing.lg : Spacing.md, Spacing.lg, Spacing.md, Spacing.sm),
-      child: Row(
-        mainAxisAlignment: expanded ? MainAxisAlignment.start : MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(color: brand.primary, borderRadius: BorderRadius.circular(Radii.md)),
-            alignment: Alignment.center,
-            child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
-          ),
-          if (expanded) ...<Widget>[
-            const SizedBox(width: Spacing.sm),
-            const Text(
-              'AjíLimo',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.3),
+          if (expanded)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
+              child: Row(
+                children: <Widget>[
+                  const Text('🇵🇪', style: TextStyle(fontSize: 16)),
+                  const SizedBox(width: Spacing.xs),
+                  const Text('🇺🇸', style: TextStyle(fontSize: 16)),
+                  const Spacer(),
+                  Text(version, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: c.textFaint)),
+                ],
+              ),
             ),
-          ],
         ],
       ),
     );
@@ -271,7 +480,6 @@ class _NavTile extends StatefulWidget {
     required this.entry,
     required this.expanded,
     required this.active,
-    required this.idleColor,
     required this.accent,
     required this.onTap,
   });
@@ -279,7 +487,6 @@ class _NavTile extends StatefulWidget {
   final NavEntry entry;
   final bool expanded;
   final bool active;
-  final Color idleColor;
   final Color accent;
   final VoidCallback onTap;
 
@@ -292,19 +499,26 @@ class _NavTileState extends State<_NavTile> {
 
   @override
   Widget build(BuildContext context) {
+    final AppColors c = context.colors;
     final bool active = widget.active;
-    final Color fg = active ? Colors.white : widget.idleColor;
+    final Color fg = active ? Colors.white : c.textMid;
     final Color bg = active
-        ? widget.accent.withValues(alpha: 0.16)
-        : (_hover ? Colors.white.withValues(alpha: 0.06) : Colors.transparent);
+        ? widget.accent
+        : (_hover ? c.surfaceAlt : Colors.transparent);
 
     final Widget tile = MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: AnimatedContainer(
         duration: Durations.fast,
-        margin: EdgeInsets.symmetric(horizontal: widget.expanded ? Spacing.md : Spacing.xs, vertical: 2),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(Radii.md)),
+        margin: EdgeInsets.symmetric(horizontal: widget.expanded ? Spacing.sm : Spacing.xs, vertical: 2),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(Radii.md),
+          boxShadow: active
+              ? <BoxShadow>[BoxShadow(color: widget.accent.withValues(alpha: 0.35), blurRadius: 12, offset: const Offset(0, 4))]
+              : null,
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(Radii.md),
           onTap: widget.entry.enabled ? widget.onTap : null,
@@ -317,22 +531,14 @@ class _NavTileState extends State<_NavTile> {
                   clipBehavior: Clip.none,
                   children: <Widget>[
                     Icon(widget.entry.icon, size: 20, color: fg),
-                    if (widget.entry.badge != null && widget.entry.badge! > 0)
+                    if (!widget.expanded && widget.entry.badge != null && widget.entry.badge! > 0)
                       Positioned(
                         right: -6,
                         top: -6,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: widget.accent,
-                            borderRadius: BorderRadius.circular(Radii.pill),
-                          ),
-                          constraints: const BoxConstraints(minWidth: 14),
-                          child: Text(
-                            '${widget.entry.badge}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
-                          ),
+                          width: 9,
+                          height: 9,
+                          decoration: BoxDecoration(color: widget.accent, shape: BoxShape.circle),
                         ),
                       ),
                   ],
@@ -342,14 +548,18 @@ class _NavTileState extends State<_NavTile> {
                   Expanded(
                     child: Text(
                       widget.entry.label,
-                      style: TextStyle(color: fg, fontSize: 14, fontWeight: active ? FontWeight.w700 : FontWeight.w500),
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 14,
+                        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                      ),
                     ),
                   ),
                   if (widget.entry.badge != null && widget.entry.badge! > 0)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: widget.accent,
+                        color: active ? Colors.white.withValues(alpha: 0.25) : widget.accent,
                         borderRadius: BorderRadius.circular(Radii.pill),
                       ),
                       child: Text(
@@ -366,143 +576,5 @@ class _NavTileState extends State<_NavTile> {
     );
 
     return widget.expanded ? tile : Tooltip(message: widget.entry.label, child: tile);
-  }
-}
-
-class _UserCard extends StatelessWidget {
-  const _UserCard({
-    required this.expanded,
-    required this.userName,
-    required this.userRoleLabel,
-    required this.accent,
-    required this.darkMode,
-    this.onToggleTheme,
-    this.onLogout,
-  });
-
-  final bool expanded;
-  final String userName;
-  final String userRoleLabel;
-  final Color accent;
-  final bool darkMode;
-  final VoidCallback? onToggleTheme;
-  final VoidCallback? onLogout;
-
-  @override
-  Widget build(BuildContext context) {
-    final String initial = userName.trim().isNotEmpty ? userName.trim()[0].toUpperCase() : '?';
-    return Padding(
-      padding: const EdgeInsets.all(Spacing.sm),
-      child: PopupMenuButton<String>(
-        tooltip: 'Cuenta',
-        onSelected: (value) {
-          if (value == 'logout') onLogout?.call();
-          if (value == 'theme') onToggleTheme?.call();
-        },
-        itemBuilder: (context) => <PopupMenuEntry<String>>[
-          PopupMenuItem<String>(enabled: false, child: Text(userRoleLabel)),
-          if (onToggleTheme != null)
-            PopupMenuItem<String>(value: 'theme', child: Text(darkMode ? 'Modo claro' : 'Modo oscuro')),
-          if (onLogout != null) const PopupMenuItem<String>(value: 'logout', child: Text('Cerrar sesión')),
-        ],
-        child: Row(
-          mainAxisAlignment: expanded ? MainAxisAlignment.start : MainAxisAlignment.center,
-          children: <Widget>[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: accent,
-              child: Text(initial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            ),
-            if (expanded) ...<Widget>[
-              const SizedBox(width: Spacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      userName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    Text(userRoleLabel, style: const TextStyle(color: Color(0xFF9A9AA0), fontSize: 11)),
-                  ],
-                ),
-              ),
-              const Icon(Icons.unfold_more, color: Color(0xFF9A9AA0), size: 18),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Topbar
-// ---------------------------------------------------------------------------
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({
-    required this.title,
-    required this.notifications,
-    required this.userName,
-    required this.showMenu,
-    required this.darkMode,
-    this.onMenu,
-    this.onToggleTheme,
-    this.onLogout,
-  });
-
-  final String title;
-  final int notifications;
-  final String userName;
-  final bool showMenu;
-  final bool darkMode;
-  final VoidCallback? onMenu;
-  final VoidCallback? onToggleTheme;
-  final VoidCallback? onLogout;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppColors c = context.colors;
-    return Container(
-      height: 64,
-      decoration: BoxDecoration(
-        color: c.surface,
-        border: Border(bottom: BorderSide(color: c.border)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-      child: Row(
-        children: <Widget>[
-          if (showMenu)
-            IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
-          else
-            const SizedBox(width: Spacing.xxs),
-          const SizedBox(width: Spacing.xs),
-          Text(title, style: Theme.of(context).textTheme.titleLarge),
-          const Spacer(),
-          IconButton(
-            tooltip: 'Notificaciones',
-            onPressed: () {},
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: <Widget>[
-                const Icon(Icons.notifications_none_outlined),
-                if (notifications > 0)
-                  Positioned(
-                    right: -2,
-                    top: -2,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(color: c.danger, shape: BoxShape.circle),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -39,28 +39,20 @@ shared/lib/design/
 - Fuentes **empaquetadas** en `shared/assets/fonts/` (sin fetch en runtime).
 
 ## Shell y navegación
-La plataforma usa un **AppShell** (`shared/lib/navigation/app_shell.dart`):
-- **Sidebar vertical** (fondo carbón) con marca, **grupos** (Operación, Defensa, Analítica,
-  Configuración, Sistema), **ítem activo** con acento de marca, **hover animado**, **badges**
-  (p. ej. reclamos) y **tarjeta de usuario** (rol + menú: tema / cerrar sesión).
-- **Topbar** con título de página, notificaciones y menú de cuenta.
+La plataforma usa un **AppShell v2** (`shared/lib/navigation/app_shell.dart`) alineado a la
+referencia del back-office de Rappi:
+- **Header** (full width): marca AjíLimo (izq.) + **selector de país**, **notificaciones** con badge
+  y **usuario** (nombre + rol + avatar con menú: tema / cerrar sesión) (der.).
+- **Sidebar vertical claro** con grupos en mayúsculas, **ítem activo tipo pill relleno** (color de
+  marca), hover animado, **badges** y pie con banderas + versión.
 - **Responsive**: sidebar expandida (≥1080), rail de íconos (720–1080) y **drawer** (<720).
-- **Gate por rol**: ítems como Usuarios/Tenants se ocultan sin permiso.
-- Rutas autenticadas se montan con **`ShellRoute`** (go_router); `/login` queda fuera del shell.
-- **Modo oscuro** conmutable desde el menú de usuario (`themeModeProvider`).
-- **Transiciones de página** (fade + slide) vía `CustomTransitionPage`.
-
-## Cabeceras y tarjetas
-- **`PageHeader`**: eyebrow + título + subtítulo + **ícono con degradado** y acciones.
-  Toda página la usa (Torre de control, Órdenes, Promos, Reclamos, Evidencia, Reportes,
-  Integraciones, Usuarios, Tenants).
-- **`KpiCard`**: ícono en chip, valor destacado, etiqueta, **chip de tendencia** (↑/↓) y hint.
+- **Gate por rol**; **modo oscuro** conmutable; **transiciones** de página (fade + slide).
 
 ## Páginas (paridad con back-office delivery)
-Operación: **Torre de control** (KPIs + métricas de servicio con deltas), **Conectividad**
-(estado en tiempo real + abrir/cerrar masivo), **Órdenes**, **Horarios** (editor semanal + festivos),
-**Promos y sabores**. Defensa: **Reclamos**, **Evidencia (KORN)**. Analítica: **Reportes**
-(gráficos), **Financiero** (pagos/conciliación). Configuración: Integraciones, Usuarios, Tenants.
+Operación: **Torre de control** (KPIs + métricas de servicio con deltas), **Conectividad**,
+**Órdenes**, **Horarios**, **Menú/Carta** (Tu Menú: tabs, chips, acordeón de categorías con
+filas de producto, toggles), **Promos y sabores**. Defensa: **Reclamos**, **Evidencia (KORN)**.
+Analítica: **Reportes**, **Financiero**. Configuración: Integraciones, Usuarios, Tenants.
 
 ## Componentes (Fase 1)
 `AppShell`, `NavGroup`/`NavEntry`, `PageHeader`, `FilterBar`, `DataTableCard`, `EmptyState`,

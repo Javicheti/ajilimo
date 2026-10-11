@@ -10,6 +10,7 @@ import '../features/connectivity/presentation/connectivity_page.dart';
 import '../features/control_tower/presentation/control_tower_page.dart';
 import '../features/evidence/presentation/evidence_page.dart';
 import '../features/financial/presentation/financial_page.dart';
+import '../features/menu/presentation/menu_page.dart';
 import '../features/orders/presentation/orders_page.dart';
 import '../features/promos/presentation/promos_page.dart';
 import '../features/reports/presentation/reports_page.dart';
@@ -86,6 +87,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/connectivity', name: 'connectivity', pageBuilder: (context, state) => _transition(state, const ConnectivityPage())),
           GoRoute(path: '/orders', name: 'orders', pageBuilder: (context, state) => _transition(state, const OrdersPage())),
           GoRoute(path: '/schedule', name: 'schedule', pageBuilder: (context, state) => _transition(state, const SchedulePage())),
+          GoRoute(path: '/menu', name: 'menu', pageBuilder: (context, state) => _transition(state, const MenuPage())),
           GoRoute(path: '/promos', name: 'promos', pageBuilder: (context, state) => _transition(state, const PromosPage())),
           GoRoute(path: '/reports', name: 'reports', pageBuilder: (context, state) => _transition(state, const ReportsPage())),
           GoRoute(path: '/financial', name: 'financial', pageBuilder: (context, state) => _transition(state, const FinancialPage())),
