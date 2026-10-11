@@ -40,10 +40,18 @@ class _TenantsPageState extends ConsumerState<TenantsPage> {
           constraints: const BoxConstraints(maxWidth: 900),
           child: ListView.separated(
             padding: const EdgeInsets.all(Spacing.lg),
-            itemCount: tenants.length,
+            itemCount: tenants.length + 1,
             separatorBuilder: (_, _) => const SizedBox(height: Spacing.md),
             itemBuilder: (context, index) {
-              final Tenant tenant = tenants[index];
+              if (index == 0) {
+                return const PageHeader(
+                  icon: Icons.add_business_outlined,
+                  eyebrow: 'Configuración',
+                  title: 'Tenants',
+                  subtitle: 'Negocios/organizaciones en la plataforma (SaaS)',
+                );
+              }
+              final Tenant tenant = tenants[index - 1];
               return AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

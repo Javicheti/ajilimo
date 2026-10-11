@@ -25,6 +25,24 @@ class _AuthRefresh extends ChangeNotifier {
 
 const String kDefaultRoute = '/control';
 
+/// Transición suave (fade + slide) para las páginas del shell.
+Page<void> _transition(GoRouterState state, Widget child) => CustomTransitionPage<void>(
+      key: state.pageKey,
+      transitionDuration: const Duration(milliseconds: 220),
+      reverseTransitionDuration: const Duration(milliseconds: 160),
+      transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondary, Widget child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 0.012), end: Offset.zero)
+                .animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+
 /// Router con redirección a `/login` sin sesión y shell con sidebar para el resto.
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   final _AuthRefresh refresh = _AuthRefresh();
@@ -61,28 +79,28 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) =>
             AppShellScreen(currentRoute: state.matchedLocation, child: child),
         routes: <RouteBase>[
-          GoRoute(path: '/control', name: 'control', builder: (context, state) => const ControlTowerPage()),
-          GoRoute(path: '/orders', name: 'orders', builder: (context, state) => const OrdersPage()),
-          GoRoute(path: '/promos', name: 'promos', builder: (context, state) => const PromosPage()),
-          GoRoute(path: '/reports', name: 'reports', builder: (context, state) => const ReportsPage()),
-          GoRoute(path: '/evidence', name: 'evidence', builder: (context, state) => const EvidencePage()),
-          GoRoute(path: '/claims', name: 'claims', builder: (context, state) => const ClaimsPage()),
+          GoRoute(path: '/control', name: 'control', pageBuilder: (context, state) => _transition(state, const ControlTowerPage())),
+          GoRoute(path: '/orders', name: 'orders', pageBuilder: (context, state) => _transition(state, const OrdersPage())),
+          GoRoute(path: '/promos', name: 'promos', pageBuilder: (context, state) => _transition(state, const PromosPage())),
+          GoRoute(path: '/reports', name: 'reports', pageBuilder: (context, state) => _transition(state, const ReportsPage())),
+          GoRoute(path: '/evidence', name: 'evidence', pageBuilder: (context, state) => _transition(state, const EvidencePage())),
+          GoRoute(path: '/claims', name: 'claims', pageBuilder: (context, state) => _transition(state, const ClaimsPage())),
           GoRoute(
             path: '/settings/integrations',
             name: 'integrations',
-            builder: (context, state) => const IntegrationsPage(),
+            pageBuilder: (context, state) => _transition(state, const IntegrationsPage()),
           ),
           GoRoute(
             path: '/settings/users',
             name: 'users',
-            builder: (context, state) => const UsersPage(),
+            pageBuilder: (context, state) => _transition(state, const UsersPage()),
           ),
           GoRoute(
             path: '/settings/tenants',
             name: 'tenants',
-            builder: (context, state) => const TenantsPage(),
+            pageBuilder: (context, state) => _transition(state, const TenantsPage()),
           ),
-          GoRoute(path: '/design', name: 'design', builder: (context, state) => const DesignGalleryPage()),
+          GoRoute(path: '/design', name: 'design', pageBuilder: (context, state) => _transition(state, const DesignGalleryPage())),
         ],
       ),
     ],

@@ -66,6 +66,12 @@ class _ClaimsPageState extends ConsumerState<ClaimsPage> {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.gavel_outlined,
+                eyebrow: 'Defensa',
+                title: 'Reclamos',
+                subtitle: 'Bandeja DiDi · responde antes de 24 h para evitar devoluciones',
+              ),
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.md,

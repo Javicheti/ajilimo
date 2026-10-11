@@ -66,6 +66,12 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.access_time_outlined,
+                eyebrow: 'Operación',
+                title: 'Órdenes',
+                subtitle: 'Cooking time objetivo 22 min · toma y monitorea en vivo',
+              ),
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.md,

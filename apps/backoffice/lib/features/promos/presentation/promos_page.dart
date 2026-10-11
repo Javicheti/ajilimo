@@ -23,6 +23,12 @@ class PromosPage extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.local_offer_outlined,
+                eyebrow: 'Operación',
+                title: 'Promos y sabores',
+                subtitle: 'Estado por app · alertas de precio full y suspensiones',
+              ),
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.md,

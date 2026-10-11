@@ -41,12 +41,20 @@ shared/lib/design/
 ## Shell y navegación
 La plataforma usa un **AppShell** (`shared/lib/navigation/app_shell.dart`):
 - **Sidebar vertical** (fondo carbón) con marca, **grupos** (Operación, Defensa, Analítica,
-  Configuración, Sistema), **ítem activo** con acento de marca, **badges** (p. ej. reclamos) y
-  **tarjeta de usuario** (rol + menú: tema / cerrar sesión).
+  Configuración, Sistema), **ítem activo** con acento de marca, **hover animado**, **badges**
+  (p. ej. reclamos) y **tarjeta de usuario** (rol + menú: tema / cerrar sesión).
 - **Topbar** con título de página, notificaciones y menú de cuenta.
 - **Responsive**: sidebar expandida (≥1080), rail de íconos (720–1080) y **drawer** (<720).
 - **Gate por rol**: ítems como Usuarios/Tenants se ocultan sin permiso.
 - Rutas autenticadas se montan con **`ShellRoute`** (go_router); `/login` queda fuera del shell.
+- **Modo oscuro** conmutable desde el menú de usuario (`themeModeProvider`).
+- **Transiciones de página** (fade + slide) vía `CustomTransitionPage`.
+
+## Cabeceras y tarjetas
+- **`PageHeader`**: eyebrow + título + subtítulo + **ícono con degradado** y acciones.
+  Toda página la usa (Torre de control, Órdenes, Promos, Reclamos, Evidencia, Reportes,
+  Integraciones, Usuarios, Tenants).
+- **`KpiCard`**: ícono en chip, valor destacado, etiqueta, **chip de tendencia** (↑/↓) y hint.
 
 ## Componentes (Fase 0)
 `AppShell`, `NavGroup`/`NavEntry`, `PageHeader`, `EmptyState`, `AppCard`, `StatusChip`,

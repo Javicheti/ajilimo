@@ -37,6 +37,12 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.bar_chart_outlined,
+                eyebrow: 'Analítica',
+                title: 'Reportes',
+                subtitle: 'Ventas por marca, app, producto y tienda · culminados y cancelados',
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[

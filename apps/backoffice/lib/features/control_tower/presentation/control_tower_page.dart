@@ -48,6 +48,8 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
       padding: const EdgeInsets.all(Spacing.lg),
       children: <Widget>[
         PageHeader(
+          icon: Icons.grid_view_rounded,
+          eyebrow: 'Operación',
           title: 'Torre de control',
           subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención',
         ),

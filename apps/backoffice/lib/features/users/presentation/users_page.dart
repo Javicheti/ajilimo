@@ -24,6 +24,12 @@ class UsersPage extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.manage_accounts_outlined,
+                eyebrow: 'Configuración',
+                title: 'Usuarios y permisos',
+                subtitle: 'Gestiona roles y accesos de tu negocio',
+              ),
               SectionHeader(
                 title: 'Usuarios',
                 subtitle: 'Tu rol: ${myRole.label}',

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Durations;
 
 import '../design/brand.dart';
 import '../design/semantic_colors.dart';
@@ -266,7 +266,7 @@ class _Brand extends StatelessWidget {
   }
 }
 
-class _NavTile extends StatelessWidget {
+class _NavTile extends StatefulWidget {
   const _NavTile({
     required this.entry,
     required this.expanded,
@@ -284,68 +284,88 @@ class _NavTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_NavTile> createState() => _NavTileState();
+}
+
+class _NavTileState extends State<_NavTile> {
+  bool _hover = false;
+
+  @override
   Widget build(BuildContext context) {
-    final Color fg = active ? Colors.white : idleColor;
-    final Widget tile = Container(
-      margin: EdgeInsets.symmetric(horizontal: expanded ? Spacing.md : Spacing.xs, vertical: 2),
-      decoration: BoxDecoration(
-        color: active ? accent.withValues(alpha: 0.16) : Colors.transparent,
-        borderRadius: BorderRadius.circular(Radii.md),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(Radii.md),
-        onTap: entry.enabled ? onTap : null,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: expanded ? Spacing.sm : 0, vertical: Spacing.sm),
-          child: Row(
-            mainAxisAlignment: expanded ? MainAxisAlignment.start : MainAxisAlignment.center,
-            children: <Widget>[
-              Stack(
-                clipBehavior: Clip.none,
-                children: <Widget>[
-                  Icon(entry.icon, size: 20, color: fg),
-                  if (entry.badge != null && entry.badge! > 0)
-                    Positioned(
-                      right: -6,
-                      top: -6,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(Radii.pill)),
-                        constraints: const BoxConstraints(minWidth: 14),
-                        child: Text(
-                          '${entry.badge}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+    final bool active = widget.active;
+    final Color fg = active ? Colors.white : widget.idleColor;
+    final Color bg = active
+        ? widget.accent.withValues(alpha: 0.16)
+        : (_hover ? Colors.white.withValues(alpha: 0.06) : Colors.transparent);
+
+    final Widget tile = MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: AnimatedContainer(
+        duration: Durations.fast,
+        margin: EdgeInsets.symmetric(horizontal: widget.expanded ? Spacing.md : Spacing.xs, vertical: 2),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(Radii.md)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Radii.md),
+          onTap: widget.entry.enabled ? widget.onTap : null,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: widget.expanded ? Spacing.sm : 0, vertical: Spacing.sm),
+            child: Row(
+              mainAxisAlignment: widget.expanded ? MainAxisAlignment.start : MainAxisAlignment.center,
+              children: <Widget>[
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: <Widget>[
+                    Icon(widget.entry.icon, size: 20, color: fg),
+                    if (widget.entry.badge != null && widget.entry.badge! > 0)
+                      Positioned(
+                        right: -6,
+                        top: -6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: widget.accent,
+                            borderRadius: BorderRadius.circular(Radii.pill),
+                          ),
+                          constraints: const BoxConstraints(minWidth: 14),
+                          child: Text(
+                            '${widget.entry.badge}',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+                          ),
                         ),
+                      ),
+                  ],
+                ),
+                if (widget.expanded) ...<Widget>[
+                  const SizedBox(width: Spacing.sm),
+                  Expanded(
+                    child: Text(
+                      widget.entry.label,
+                      style: TextStyle(color: fg, fontSize: 14, fontWeight: active ? FontWeight.w700 : FontWeight.w500),
+                    ),
+                  ),
+                  if (widget.entry.badge != null && widget.entry.badge! > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: widget.accent,
+                        borderRadius: BorderRadius.circular(Radii.pill),
+                      ),
+                      child: Text(
+                        '${widget.entry.badge}',
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
                       ),
                     ),
                 ],
-              ),
-              if (expanded) ...<Widget>[
-                const SizedBox(width: Spacing.sm),
-                Expanded(
-                  child: Text(
-                    entry.label,
-                    style: TextStyle(color: fg, fontSize: 14, fontWeight: active ? FontWeight.w700 : FontWeight.w500),
-                  ),
-                ),
-                if (entry.badge != null && entry.badge! > 0)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                    decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(Radii.pill)),
-                    child: Text(
-                      '${entry.badge}',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
-                    ),
-                  ),
               ],
-            ],
+            ),
           ),
         ),
       ),
     );
 
-    return expanded ? tile : Tooltip(message: entry.label, child: tile);
+    return widget.expanded ? tile : Tooltip(message: widget.entry.label, child: tile);
   }
 }
 

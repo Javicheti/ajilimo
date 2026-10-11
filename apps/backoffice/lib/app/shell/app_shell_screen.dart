@@ -8,6 +8,7 @@ import '../../features/claims/presentation/claims_providers.dart';
 import '../../features/users/domain/app_user.dart';
 import '../../features/users/domain/user_role.dart';
 import '../../features/users/presentation/user_providers.dart';
+import '../../core/theme/theme_provider.dart';
 
 /// Shell autenticado: sidebar vertical + topbar + contenido de la ruta activa.
 class AppShellScreen extends ConsumerWidget {
@@ -34,6 +35,8 @@ class AppShellScreen extends ConsumerWidget {
       userName: userName,
       userRoleLabel: role.label,
       notifications: pendingClaims,
+      darkMode: ref.watch(themeModeProvider) == ThemeMode.dark,
+      onToggleTheme: () => ref.read(themeModeProvider.notifier).toggle(),
       onLogout: () => ref.read(authServiceProvider)?.signOut(),
       child: child,
     );

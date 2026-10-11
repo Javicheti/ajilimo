@@ -64,14 +64,22 @@ class _IntegrationsPageState extends ConsumerState<IntegrationsPage> {
           constraints: const BoxConstraints(maxWidth: 900),
           child: ListView.separated(
             padding: const EdgeInsets.all(Spacing.lg),
-            itemCount: _items.length,
+            itemCount: _items.length + 1,
             separatorBuilder: (_, _) => const SizedBox(height: Spacing.md),
             itemBuilder: (context, index) {
-              final Integration integration = _items[index];
+              if (index == 0) {
+                return const PageHeader(
+                  icon: Icons.hub_outlined,
+                  eyebrow: 'Configuración',
+                  title: 'Integraciones',
+                  subtitle: 'Conexión con Rappi, DiDi y PedidosYa',
+                );
+              }
+              final Integration integration = _items[index - 1];
               return _IntegrationCard(
                 integration: integration,
                 testing: _testing.contains(integration.channel),
-                onEnvironmentChanged: (env) => _setEnvironment(index, env),
+                onEnvironmentChanged: (env) => _setEnvironment(index - 1, env),
                 onTest: () => _test(integration),
               );
             },

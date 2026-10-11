@@ -22,6 +22,12 @@ class EvidencePage extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(Spacing.lg),
             children: <Widget>[
+              const PageHeader(
+                icon: Icons.photo_camera_outlined,
+                eyebrow: 'Defensa',
+                title: 'Evidencia',
+                subtitle: 'KORN · foto del pedido ligada a cada orden',
+              ),
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.md,
