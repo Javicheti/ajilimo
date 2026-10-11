@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'semantic_colors.dart';
 
-/// Tipografía basada en **Roboto** + cifras tabulares.
+/// Tipografía basada en **Montserrat** + cifras tabulares.
 /// Las fuentes están empaquetadas en `assets/fonts/` (sin fetch en runtime).
 class AppTypography {
   const AppTypography._();
 
-  static const String displayFamily = 'Roboto';
-  static const String bodyFamily = 'Roboto';
+  static const String displayFamily = 'Montserrat';
+  static const String bodyFamily = 'Montserrat';
 
   static const List<FontFeature> _tabular = <FontFeature>[FontFeature.tabularFigures()];
 

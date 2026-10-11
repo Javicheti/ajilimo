@@ -28,9 +28,9 @@ class DesignGalleryPage extends StatelessWidget {
             runSpacing: Spacing.md,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
-              AppLogo(size: 32),
-              AppLogo(size: 48),
-              AppLogo(size: 48, showWordmark: true, wordmarkColor: context.colors.textStrong),
+              AppLogo(size: 34),
+              AppLogo(size: 52),
+              AppLogo(size: 52, emblemOnly: true),
             ],
           ),
         ),
@@ -124,17 +124,17 @@ class _TypographyShowcase extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Display · Roboto', style: t.displayMedium),
+        Text('Display · Montserrat', style: t.displayMedium),
         const SizedBox(height: Spacing.xs),
-        Text('Headline · Roboto', style: t.headlineMedium),
+        Text('Headline · Montserrat', style: t.headlineMedium),
         const SizedBox(height: Spacing.xs),
-        Text('Title · Roboto', style: t.titleLarge),
+        Text('Title · Montserrat', style: t.titleLarge),
         const SizedBox(height: Spacing.sm),
-        Text('Body · Roboto con cifras tabulares — S/ 12,340.50', style: t.bodyLarge),
+        Text('Body · Montserrat con cifras tabulares — S/ 12,340.50', style: t.bodyLarge),
         const SizedBox(height: Spacing.xxs),
-        Text('Body small · Roboto — texto secundario', style: t.bodySmall),
+        Text('Body small · Montserrat — texto secundario', style: t.bodySmall),
         const SizedBox(height: Spacing.xxs),
-        Text('Label · Roboto — 0123456789', style: t.labelMedium),
+        Text('Label · Montserrat — 0123456789', style: t.labelMedium),
       ],
     );
   }

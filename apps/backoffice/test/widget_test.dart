@@ -1,3 +1,4 @@
+import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,7 +21,7 @@ void main() {
     await tester.pumpWidget(build());
     await tester.pumpAndSettle();
 
-    expect(find.text('AJÍ LIMO'), findsOneWidget);
+    expect(find.byType(AppLogo), findsWidgets);
     expect(find.text('Torre de control'), findsWidgets);
     expect(find.text('Reportes'), findsOneWidget);
   });

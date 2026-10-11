@@ -37,14 +37,12 @@ Tomada del **logo AjíLimo** (ají rojo, lima, ola teal, crema, marrón):
 | Superficie/Fondo/Borde | `#FFFFFF` / `#F7F7F8` / `#E6E6EA` |
 
 ## Marca / logo
-- `AppLogo` (`shared/lib/branding/app_logo.dart`): emblema circular (ají + lima + ola)
-  pintado en código, con **wordmark** opcional. Escala vía `FittedBox`.
-- Ubicado en: **header** (expandido/rail), **drawer**, **login** (centrado, grande) y
-  app **KORN** (AppBar) + galería `/design`.
-- Para usar el PNG oficial: colocar en `apps/backoffice/assets/brand/logo.png`.
+- `AppLogo` (`shared/lib/branding/app_logo.dart`): usa el **logo oficial** (`shared/assets/brand/logo.png`).
+  Modo completo (emblema + wordmark) o `emblemOnly` (emblema recortado **en círculo**).
+- Ubicado en: **header** (completo/rail), **drawer**, **login** (centrado, grande) y app **KORN** + galería `/design`.
 
 ## Tipografía
-- **Roboto** para títulos y datos, con **cifras tabulares**.
+- **Montserrat** para títulos y datos, con **cifras tabulares**.
 - Fuentes **empaquetadas** en `shared/assets/fonts/` (sin fetch en runtime).
 
 ## Shell y navegación

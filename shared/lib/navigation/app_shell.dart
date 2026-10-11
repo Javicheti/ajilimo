@@ -205,9 +205,8 @@ class _Header extends StatelessWidget {
                     IconButton(icon: const Icon(Icons.menu), onPressed: onMenu)
                   else
                     AppLogo(
-                      size: 34,
-                      showWordmark: leftWidth > 100,
-                      wordmarkColor: c.textStrong,
+                      size: leftWidth > 100 ? 40 : 46,
+                      emblemOnly: leftWidth <= 100,
                     ),
                 ],
               ),
@@ -362,7 +361,7 @@ class _DrawerHeader extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),
-        child: AppLogo(size: 34, showWordmark: true, wordmarkColor: context.colors.textStrong),
+        child: const AppLogo(size: 42),
       ),
     );
   }

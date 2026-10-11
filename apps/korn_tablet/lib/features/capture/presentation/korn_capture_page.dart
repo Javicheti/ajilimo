@@ -71,7 +71,7 @@ class _KornCapturePageState extends State<KornCapturePage> {
       appBar: AppBar(
         title: Row(
           children: <Widget>[
-            const AppLogo(size: 28, wordmarkColor: Colors.white),
+            const AppLogo(size: 34, emblemOnly: true),
             const SizedBox(width: Spacing.sm),
             const Text('KORN · Evidencia del pedido'),
           ],

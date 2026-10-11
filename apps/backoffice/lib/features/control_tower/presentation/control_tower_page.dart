@@ -150,20 +150,19 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
             subtitle: '${alerts.length} tiendas requieren atención',
           ),
           AppCard(
+            padding: EdgeInsets.zero,
             child: alerts.isEmpty
-                ? Text('Sin alertas.', style: Theme.of(context).textTheme.bodyMedium)
+                ? Padding(
+                    padding: const EdgeInsets.all(Spacing.lg),
+                    child: Text('Sin alertas.', style: Theme.of(context).textTheme.bodyMedium),
+                  )
                 : Column(
-                    children: alerts
-                        .map(
-                          (row) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: StatusChip(status: row.status, compact: true),
-                            title: Text(row.name),
-                            subtitle: Text(row.brand),
-                            trailing: ChannelBadge(channel: row.channel),
-                          ),
-                        )
-                        .toList(),
+                    children: <Widget>[
+                      for (int i = 0; i < alerts.length; i++) ...<Widget>[
+                        _AlertRow(row: alerts[i]),
+                        if (i < alerts.length - 1) Divider(height: 1, color: c.border),
+                      ],
+                    ],
                   ),
           ),
         ],
@@ -210,6 +209,58 @@ class _StoreCard extends StatelessWidget {
           const SizedBox(height: Spacing.sm),
           StatusChip(status: row.status),
         ],
+      ),
+    );
+  }
+}
+
+class _AlertRow extends StatelessWidget {
+  const _AlertRow({required this.row});
+  final StoreStatusRow row;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    final Color accent = switch (row.status) {
+      StoreStatus.open => c.success,
+      StoreStatus.paused => c.warning,
+      StoreStatus.closed => c.danger,
+      StoreStatus.suspended => c.suspended,
+      StoreStatus.highDemand => c.brandPrimary,
+    };
+
+    return InkWell(
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: 4,
+              height: 40,
+              decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(Radii.pill)),
+            ),
+            const SizedBox(width: Spacing.md),
+            SizedBox(
+              width: 190,
+              child: Align(alignment: Alignment.centerLeft, child: StatusChip(status: row.status)),
+            ),
+            const SizedBox(width: Spacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(row.name, style: Theme.of(context).textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 2),
+                  Text(row.brand, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: c.textMid)),
+                ],
+              ),
+            ),
+            ChannelBadge(channel: row.channel),
+            const SizedBox(width: Spacing.sm),
+            Icon(Icons.chevron_right, color: c.textFaint, size: 20),
+          ],
+        ),
       ),
     );
   }
