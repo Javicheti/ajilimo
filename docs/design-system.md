@@ -35,7 +35,7 @@ shared/lib/design/
 | Oscuro | fondo `#0F0F12`, superficie `#1B1B1F`, borde `#2A2A31` |
 
 ## Tipografía
-- **Sora** (títulos) + **Inter** (datos), con **cifras tabulares** (`FontFeature.tabularFigures`).
+- **Jost** (geométrica, estilo Futura) para títulos y datos, con **cifras tabulares**.
 - Fuentes **empaquetadas** en `shared/assets/fonts/` (sin fetch en runtime).
 
 ## Shell y navegación

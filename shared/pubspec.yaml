@@ -19,21 +19,13 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
-    - family: Inter
+    - family: Jost
       fonts:
-        - asset: assets/fonts/Inter-400.ttf
+        - asset: assets/fonts/Jost-400.ttf
           weight: 400
-        - asset: assets/fonts/Inter-500.ttf
+        - asset: assets/fonts/Jost-500.ttf
           weight: 500
-        - asset: assets/fonts/Inter-600.ttf
+        - asset: assets/fonts/Jost-600.ttf
           weight: 600
-        - asset: assets/fonts/Inter-700.ttf
-          weight: 700
-    - family: Sora
-      fonts:
-        - asset: assets/fonts/Sora-400.ttf
-          weight: 400
-        - asset: assets/fonts/Sora-600.ttf
-          weight: 600
-        - asset: assets/fonts/Sora-700.ttf
+        - asset: assets/fonts/Jost-700.ttf
           weight: 700
