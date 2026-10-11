@@ -25,4 +25,23 @@ void main() {
     expect(find.text('Abrir tiendas'), findsOneWidget);
     expect(find.text('Alenka´s Bakery - Callao'), findsOneWidget);
   });
+
+  testWidgets('Abre el detalle por día y hora', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(2400, 2400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [apiClientProvider.overrideWithValue(FakeApi())],
+        child: MaterialApp(theme: AppTheme.light(), home: const Scaffold(body: ConnectivityPage())),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Ver por día y hora').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Conectividad por día y hora'), findsOneWidget);
+    expect(find.text('Abrir tienda'), findsOneWidget);
+  });
 }

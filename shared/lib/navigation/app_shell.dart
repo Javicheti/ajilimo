@@ -207,7 +207,7 @@ class _Header extends StatelessWidget {
                     else
                       Flexible(
                         child: AppLogo(
-                          size: leftWidth > 100 ? 40 : 46,
+                          size: leftWidth > 100 ? 48 : 54,
                           emblemOnly: leftWidth <= 100,
                         ),
                       ),
@@ -373,7 +373,7 @@ class _DrawerHeader extends StatelessWidget {
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),
-        child: const AppLogo(size: 42),
+        child: const AppLogo(size: 50),
       ),
     );
   }

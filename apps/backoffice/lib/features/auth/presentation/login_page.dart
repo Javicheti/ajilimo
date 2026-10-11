@@ -95,7 +95,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const Center(child: AppLogo(size: 86)),
+                  const Center(child: AppLogo(size: 104)),
                   const SizedBox(height: Spacing.xs),
                   Center(
                     child: Text(
