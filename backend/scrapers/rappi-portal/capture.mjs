@@ -64,14 +64,20 @@ page.on('response', async (response) => {
 console.log('▶ Abriendo el portal. Inicia sesión y navega a las secciones que quieras capturar.');
 await page.goto(target, { waitUntil: 'domcontentloaded' });
 
-console.log('▶ Cuando termines de navegar, pulsa ENTER aquí para guardar los datos…');
-await new Promise((resolve) => {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  rl.question('', () => {
-    rl.close();
-    resolve();
+const autoSeconds = Number.parseInt(process.env.AUTO_SECONDS || '0', 10);
+if (autoSeconds > 0) {
+  console.log(`▶ Capturando automáticamente en ${autoSeconds}s. Inicia sesión y navega ahora…`);
+  await page.waitForTimeout(autoSeconds * 1000);
+} else {
+  console.log('▶ Cuando termines de navegar, pulsa ENTER aquí para guardar los datos…');
+  await new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question('', () => {
+      rl.close();
+      resolve();
+    });
   });
-});
+}
 
 await writeFile(`${outDir}network.json`, JSON.stringify(captured, null, 2));
 await writeFile(`${outDir}page.html`, await page.content());
