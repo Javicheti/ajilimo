@@ -2,6 +2,7 @@ import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/api/api_client.dart';
 import '../data/menu_repository.dart';
 import '../domain/menu_item.dart';
 
@@ -21,6 +22,32 @@ class _MenuPageState extends ConsumerState<MenuPage> {
   void initState() {
     super.initState();
     _categories = ref.read(menuRepositoryProvider).seed();
+    _loadRemote();
+  }
+
+  Future<void> _loadRemote() async {
+    try {
+      final List<Map<String, dynamic>> menus = await ref.read(apiClientProvider).getMenu();
+      if (!mounted || menus.isEmpty) return;
+      final List<Map<String, dynamic>> items =
+          (menus.first['items'] as List<dynamic>).cast<Map<String, dynamic>>();
+      final List<MenuProduct> products = items
+          .map(
+            (it) => MenuProduct(
+              id: (it['id'] ?? '').toString(),
+              name: (it['title'] ?? '').toString(),
+              description: '',
+              price: ((it['price'] as num?) ?? 0).toDouble(),
+              available: it['isAvailable'] == true,
+            ),
+          )
+          .where((p) => p.name.isNotEmpty)
+          .toList();
+      if (products.isEmpty) return;
+      setState(() => _categories = <MenuCategory>[MenuCategory(name: 'Carta (Rappi)', products: products)]);
+    } catch (_) {
+      // Sin bridge: se mantienen datos locales.
+    }
   }
 
   @override

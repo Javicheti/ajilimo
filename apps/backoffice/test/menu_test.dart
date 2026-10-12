@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:backoffice/core/api/api_client.dart';
 import 'package:backoffice/features/menu/presentation/menu_page.dart';
+
+import 'support/fake_api.dart';
 
 void main() {
   testWidgets('Muestra Tu Menú con categorías y productos', (WidgetTester tester) async {
@@ -12,6 +15,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [apiClientProvider.overrideWithValue(FakeApi())],
         child: MaterialApp(theme: AppTheme.light(), home: const Scaffold(body: MenuPage())),
       ),
     );

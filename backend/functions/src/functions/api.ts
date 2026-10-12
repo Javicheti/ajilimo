@@ -30,6 +30,7 @@ interface BridgeSummary {
   serviceMetrics?: Record<string, unknown>;
   sales?: Record<string, unknown>;
   orders?: Array<Record<string, unknown>>;
+  menus?: Array<Record<string, unknown>>;
 }
 
 async function loadBridge(provider: string): Promise<BridgeSummary | null> {
@@ -148,6 +149,23 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
     }
 
     if (path.endsWith('/orders')) {
+      if (bridgeEnabled(req)) {
+        const bridge = await loadBridge('rappi');
+        if (bridge?.orders && bridge.orders.length > 0) {
+          const rows = bridge.orders.map((o) => ({
+            channel: 'rappi',
+            storeId: '',
+            storeName: String(o.store ?? ''),
+            orderId: String(o.orderId ?? ''),
+            status: String(o.state ?? ''),
+            itemCount: 1,
+            total: typeof o.total === 'number' ? o.total : 0,
+          }));
+          res.status(200).json({ orders: rows, source: 'bridge', generatedAt: bridge.generatedAt ?? now.toISOString() });
+          return;
+        }
+      }
+
       const entries: Array<{ channel: IntegrationConfig['provider']; storeId: string; storeName?: string; order: Order }> = [];
       for (const config of loadIntegrations()) {
         try {
@@ -161,7 +179,17 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
           logger.warn('Órdenes: canal no disponible', { provider: config.provider, error: String(error) });
         }
       }
-      res.status(200).json({ orders: buildOrderRows(entries), generatedAt: now.toISOString() });
+      res.status(200).json({ orders: buildOrderRows(entries), source: 'connectors', generatedAt: now.toISOString() });
+      return;
+    }
+
+    if (path.endsWith('/menu')) {
+      const bridge = await loadBridge('rappi');
+      res.status(200).json({
+        source: bridge ? 'bridge' : 'none',
+        menus: bridge?.menus ?? [],
+        generatedAt: bridge?.generatedAt ?? now.toISOString(),
+      });
       return;
     }
 

@@ -73,6 +73,18 @@ class ApiClient {
     }
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
+
+  /// Menú real desde el bridge (Portal Rappi).
+  Future<List<Map<String, dynamic>>> getMenu() async {
+    final http.Response response = await _client
+        .get(Uri.parse('$baseUrl/menu'))
+        .timeout(const Duration(seconds: 10));
+    if (response.statusCode != 200) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+    final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['menus'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
 }
 
 final Provider<ApiClient> apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
