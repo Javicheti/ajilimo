@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import readline from 'node:readline';
 import { chromium } from 'playwright';
@@ -21,7 +22,7 @@ const DEFAULT_URL =
   'https://partners.rappi.com/home?from=2026-10-03&to=2026-10-10&brandId=PE57159&storeIds=PE73017,PE73507,PE73506,PE73505';
 
 const target = process.env.TARGET_URL || DEFAULT_URL;
-const outDir = new URL('./out/', import.meta.url).pathname;
+const outDir = fileURLToPath(new URL('./out/', import.meta.url));
 const headless = process.env.HEADLESS === '1';
 const useState = process.env.USE_STATE === '1';
 

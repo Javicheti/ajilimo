@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 /**
@@ -7,7 +8,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
  * Uso: node parse.mjs
  */
 
-const outDir = new URL('./out/', import.meta.url).pathname;
+const outDir = fileURLToPath(new URL('./out/', import.meta.url));
 await mkdir(outDir, { recursive: true });
 
 const network = JSON.parse(await readFile(`${outDir}network.json`, 'utf8'));
@@ -122,6 +123,14 @@ const summary = {
   orders,
   menus,
 };
+
+// Conserva métricas/ventas previas si esta corrida no las trajo.
+if ((summary.serviceMetrics?.reclamosPct ?? null) === null && previous?.serviceMetrics) {
+  summary.serviceMetrics = previous.serviceMetrics;
+}
+if ((summary.sales?.totalAmount ?? null) === null && previous?.sales) {
+  summary.sales = previous.sales;
+}
 
 await writeFile(`${outDir}summary.json`, JSON.stringify(summary, null, 2));
 

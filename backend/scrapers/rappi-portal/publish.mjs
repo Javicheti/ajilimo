@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Publica el resumen capturado (out/summary.json) al BFF (modo bridge).
@@ -10,7 +11,7 @@ import { readFile } from 'node:fs/promises';
  *   BRIDGE_TOKEN (obligatorio)
  */
 
-const summaryPath = new URL('./out/summary.json', import.meta.url).pathname;
+const summaryPath = fileURLToPath(new URL('./out/summary.json', import.meta.url));
 const summary = JSON.parse(await readFile(summaryPath, 'utf8'));
 
 const url = process.env.BRIDGE_URL || 'https://api-mor35f5doa-uc.a.run.app/bridge/rappi/summary';

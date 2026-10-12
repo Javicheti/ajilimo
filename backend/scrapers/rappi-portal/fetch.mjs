@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
@@ -20,7 +21,7 @@ if (patterns.length === 0) {
   process.exit(1);
 }
 
-const outDir = new URL('./out/', import.meta.url).pathname;
+const outDir = fileURLToPath(new URL('./out/', import.meta.url));
 await mkdir(outDir, { recursive: true });
 
 function safeJson(text) {

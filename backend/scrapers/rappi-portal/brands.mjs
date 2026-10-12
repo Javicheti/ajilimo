@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
@@ -6,7 +7,7 @@ import { chromium } from 'playwright';
  * Guarda out/brands.json = [{ brandId, brandName, storeIds }]
  */
 
-const outDir = new URL('./out/', import.meta.url).pathname;
+const outDir = fileURLToPath(new URL('./out/', import.meta.url));
 await mkdir(outDir, { recursive: true });
 
 const state = JSON.parse(await readFile(`${outDir}state.json`, 'utf8'));

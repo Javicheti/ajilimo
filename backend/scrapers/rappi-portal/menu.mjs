@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
@@ -9,7 +10,7 @@ import { chromium } from 'playwright';
  *   STORES="73017,73507" node menu.mjs
  */
 
-const outDir = new URL('./out/', import.meta.url).pathname;
+const outDir = fileURLToPath(new URL('./out/', import.meta.url));
 await mkdir(outDir, { recursive: true });
 
 const DEFAULT_STORES =
