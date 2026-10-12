@@ -22,6 +22,9 @@ node_modules/
 npm-debug.log*
 functions/lib/
 
+# Scrapers (salidas con datos/sesión)
+backend/scrapers/**/out/
+
 # Secretos / entorno
 .env
 .env.*

@@ -1,0 +1,13 @@
+{
+  "name": "rappi-portal-capture",
+  "description": "Captura sesiones/respuestas del Portal Partners de Rappi (Playwright).",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}
