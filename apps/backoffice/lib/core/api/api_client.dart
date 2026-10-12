@@ -5,29 +5,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 /// Cliente del BFF de AjíLimo. La URL base es configurable con
-/// `--dart-define=API_BASE_URL=...`; por defecto apunta al emulador local de
-/// funciones (que a su vez lee de los mocks).
+/// `--dart-define=API_BASE_URL=...`; por defecto apunta al BFF desplegado.
 class ApiClient {
   ApiClient({String? baseUrl, http.Client? client})
       : baseUrl = baseUrl ??
             const String.fromEnvironment(
               'API_BASE_URL',
-              defaultValue: 'http://127.0.0.1:5001/ajilimo-830ca/us-central1/api',
+              defaultValue: 'https://api-mor35f5doa-uc.a.run.app',
             ),
         _client = client ?? http.Client();
 
   final String baseUrl;
   final http.Client _client;
 
-  Future<List<Map<String, dynamic>>> getControlTower() async {
-    final http.Response response = await _client
-        .get(Uri.parse('$baseUrl/control-tower'))
-        .timeout(const Duration(seconds: 8));
+  Future<List<Map<String, dynamic>>> getControlTower({String? brand}) async {
+    final Uri uri = Uri.parse('$baseUrl/control-tower').replace(
+      queryParameters: brand != null ? <String, String>{'brand': brand} : null,
+    );
+    final http.Response response = await _client.get(uri).timeout(const Duration(seconds: 8));
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');
     }
     final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
     return (data['rows'] as List<dynamic>).cast<Map<String, dynamic>>();
+  }
+
+  /// Marcas disponibles (bridge).
+  Future<List<Map<String, dynamic>>> getBrands() async {
+    final http.Response response = await _client
+        .get(Uri.parse('$baseUrl/brands'))
+        .timeout(const Duration(seconds: 8));
+    if (response.statusCode != 200) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+    final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['brands'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
 
   Future<List<Map<String, dynamic>>> getConnections() async {

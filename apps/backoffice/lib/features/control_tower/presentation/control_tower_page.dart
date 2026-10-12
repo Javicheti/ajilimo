@@ -2,6 +2,7 @@ import 'package:ajilimo_shared/ajilimo_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/api/api_client.dart';
 import '../data/control_tower_repository.dart';
 
 class ControlTowerPage extends ConsumerStatefulWidget {
@@ -14,23 +15,45 @@ class ControlTowerPage extends ConsumerStatefulWidget {
 class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
   DeliveryChannel? _channelFilter;
   late List<StoreStatusRow> _all;
+  String? _brand;
+  List<Map<String, dynamic>> _brands = <Map<String, dynamic>>[];
 
   @override
   void initState() {
     super.initState();
     final ControlTowerRepository repository = ref.read(controlTowerRepositoryProvider);
     _all = repository.seed();
-    _loadRemote(repository);
+    _initBrands(repository);
+  }
+
+  Future<void> _initBrands(ControlTowerRepository repository) async {
+    try {
+      final List<Map<String, dynamic>> brands = await ref.read(apiClientProvider).getBrands();
+      if (mounted && brands.isNotEmpty) {
+        setState(() {
+          _brands = brands;
+          _brand ??= brands.first['brandId'] as String?;
+        });
+      }
+    } catch (_) {
+      // sin marcas (modo local)
+    }
+    await _loadRemote(repository);
   }
 
   Future<void> _loadRemote(ControlTowerRepository repository) async {
     try {
-      final List<StoreStatusRow> remote = await repository.fetchRemote();
+      final List<StoreStatusRow> remote = await repository.fetchRemote(brand: _brand);
       if (!mounted || remote.isEmpty) return;
       setState(() => _all = remote);
     } catch (_) {
       // Sin BFF disponible: se mantienen los datos ficticios locales.
     }
+  }
+
+  void _onBrandChanged(String? brand) {
+    setState(() => _brand = brand);
+    _loadRemote(ref.read(controlTowerRepositoryProvider));
   }
 
   @override
@@ -52,6 +75,9 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
           eyebrow: 'Operación',
           title: 'Torre de control',
           subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención',
+          actions: <Widget>[
+            if (_brands.isNotEmpty) _BrandSelector(brands: _brands, value: _brand, onChanged: _onBrandChanged),
+          ],
         ),
         const SectionHeader(title: 'Métricas de servicio', subtitle: 'Últimos 7 días vs. periodo anterior'),
         Wrap(
@@ -208,6 +234,45 @@ class _StoreCard extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.sm),
           StatusChip(status: row.status),
+        ],
+      ),
+    );
+  }
+}
+
+class _BrandSelector extends StatelessWidget {
+  const _BrandSelector({required this.brands, required this.value, required this.onChanged});
+  final List<Map<String, dynamic>> brands;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppColors c = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.xs),
+      decoration: BoxDecoration(
+        color: c.surface,
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: c.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(Icons.storefront_outlined, size: 16, color: c.textMid),
+          const SizedBox(width: Spacing.xs),
+          DropdownButton<String>(
+            value: value,
+            underline: const SizedBox.shrink(),
+            isDense: true,
+            items: brands
+                .map((b) => DropdownMenuItem<String>(
+                      value: b['brandId'] as String,
+                      child: Text('Marca: ${b['brandName']}'),
+                    ))
+                .toList(),
+            onChanged: onChanged,
+          ),
         ],
       ),
     );

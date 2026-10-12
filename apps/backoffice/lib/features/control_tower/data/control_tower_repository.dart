@@ -72,9 +72,9 @@ class ControlTowerRepository {
         ),
       ];
 
-  Future<List<StoreStatusRow>> fetchRemote() async {
+  Future<List<StoreStatusRow>> fetchRemote({String? brand}) async {
     if (api == null) return const <StoreStatusRow>[];
-    final List<Map<String, dynamic>> rows = await api!.getControlTower();
+    final List<Map<String, dynamic>> rows = await api!.getControlTower(brand: brand);
     return rows
         .map(
           (row) => StoreStatusRow(

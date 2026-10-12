@@ -7,15 +7,20 @@ class FakeApi extends ApiClient {
     this.orders = const <Map<String, dynamic>>[],
     this.claims = const <Map<String, dynamic>>[],
     this.connections = const <Map<String, dynamic>>[],
+    this.brands = const <Map<String, dynamic>>[],
   });
 
   final List<Map<String, dynamic>> controlTower;
   final List<Map<String, dynamic>> orders;
   final List<Map<String, dynamic>> claims;
   final List<Map<String, dynamic>> connections;
+  final List<Map<String, dynamic>> brands;
 
   @override
-  Future<List<Map<String, dynamic>>> getControlTower() async => controlTower;
+  Future<List<Map<String, dynamic>>> getControlTower({String? brand}) async => controlTower;
+
+  @override
+  Future<List<Map<String, dynamic>>> getBrands() async => brands;
 
   @override
   Future<List<Map<String, dynamic>>> getOrders() async => orders;

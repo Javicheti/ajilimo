@@ -24,6 +24,8 @@ interface BridgeStore {
 }
 
 interface BridgeSummary {
+  brandId?: string;
+  brandName?: string;
   source?: string;
   generatedAt?: string;
   stores?: BridgeStore[];
@@ -33,21 +35,40 @@ interface BridgeSummary {
   menus?: Array<Record<string, unknown>>;
 }
 
-async function loadBridge(provider: string): Promise<BridgeSummary | null> {
+interface BridgeDoc {
+  defaultBrandId?: string;
+  brands?: Record<string, BridgeSummary>;
+}
+
+async function loadBridgeDoc(provider: string): Promise<BridgeDoc | null> {
   try {
     const doc = await getFirestore().collection('bridges').doc(provider).get();
-    return doc.exists ? (doc.data() as BridgeSummary) : null;
+    return doc.exists ? (doc.data() as BridgeDoc) : null;
   } catch (error) {
     logger.warn('Bridge no disponible', { provider, error: String(error) });
     return null;
   }
 }
 
-async function saveBridge(provider: string, summary: BridgeSummary): Promise<void> {
-  await getFirestore()
-    .collection('bridges')
-    .doc(provider)
-    .set({ ...summary, receivedAt: new Date().toISOString() }, { merge: true });
+function pickBrand(doc: BridgeDoc | null, brandId?: string): BridgeSummary | null {
+  if (!doc?.brands) return null;
+  const id = brandId || doc.defaultBrandId || Object.keys(doc.brands)[0];
+  return id ? doc.brands[id] ?? null : null;
+}
+
+async function saveBrandSummary(provider: string, summary: BridgeSummary): Promise<void> {
+  const brandId = summary.brandId || 'default';
+  const ref = getFirestore().collection('bridges').doc(provider);
+  const snap = await ref.get();
+  const current = (snap.exists ? (snap.data() as BridgeDoc) : {}) ?? {};
+  const brands: Record<string, BridgeSummary> = { ...(current.brands ?? {}) };
+  brands[brandId] = { ...summary, receivedAt: new Date().toISOString() } as BridgeSummary;
+  await ref.set({ defaultBrandId: brandId, brands }, { merge: false });
+}
+
+function brandParam(req: { query: Record<string, unknown> }): string | undefined {
+  const value = req.query.brand;
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
 function bridgeEnabled(req: { query: Record<string, unknown> }): boolean {
@@ -55,9 +76,8 @@ function bridgeEnabled(req: { query: Record<string, unknown> }): boolean {
 }
 
 /**
- * BFF de AjíLimo. Sirve datos normalizados a las apps.
- * - Modo normal: conectores (mocks/real).
- * - Modo BRIDGE: datos reales del Portal Rappi (scraper) guardados en Firestore.
+ * BFF de AjíLimo. Modo normal (conectores) o BRIDGE (datos reales del Portal
+ * Rappi, multi-marca, guardados en Firestore).
  */
 export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, res) => {
   const path = (req.url ?? '/').split('?')[0];
@@ -73,35 +93,46 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
           res.status(401).json({ ok: false, error: 'invalid_token' });
           return;
         }
-        await saveBridge(provider, req.body as BridgeSummary);
-        logger.info('Bridge actualizado', { provider });
+        await saveBrandSummary(provider, req.body as BridgeSummary);
+        logger.info('Bridge actualizado', { provider, brandId: (req.body as BridgeSummary)?.brandId });
         res.status(200).json({ ok: true, provider });
         return;
       }
-      const summary = await loadBridge(provider);
+      const summary = pickBrand(await loadBridgeDoc(provider), brandParam(req));
       res.status(200).json({ ok: true, provider, summary });
       return;
     }
 
-    // --- Bridge: reportes (métricas + ventas + órdenes reales) -----------
+    // --- Marcas disponibles (bridge) ------------------------------------
+    if (path.endsWith('/brands')) {
+      const doc = await loadBridgeDoc('rappi');
+      const brands = doc?.brands
+        ? Object.entries(doc.brands).map(([brandId, s]) => ({ brandId, brandName: s.brandName ?? brandId }))
+        : [];
+      res.status(200).json({ brands, defaultBrandId: doc?.defaultBrandId ?? null });
+      return;
+    }
+
+    // --- Reportes (métricas + ventas + órdenes) -------------------------
     if (path.endsWith('/reports')) {
-      const bridge = await loadBridge('rappi');
+      const summary = pickBrand(await loadBridgeDoc('rappi'), brandParam(req));
       res.status(200).json({
-        source: bridge ? 'bridge' : 'none',
-        serviceMetrics: bridge?.serviceMetrics ?? null,
-        sales: bridge?.sales ?? null,
-        orders: bridge?.orders ?? [],
-        generatedAt: bridge?.generatedAt ?? now.toISOString(),
+        source: summary ? 'bridge' : 'none',
+        brandId: summary?.brandId ?? null,
+        brandName: summary?.brandName ?? null,
+        serviceMetrics: summary?.serviceMetrics ?? null,
+        sales: summary?.sales ?? null,
+        orders: summary?.orders ?? [],
+        generatedAt: summary?.generatedAt ?? now.toISOString(),
       });
       return;
     }
 
     if (path.endsWith('/control-tower')) {
-      // Bridge primero (datos reales del portal).
       if (bridgeEnabled(req)) {
-        const bridge = await loadBridge('rappi');
-        if (bridge?.stores && bridge.stores.length > 0) {
-          const rows = bridge.stores.map((store) => ({
+        const summary = pickBrand(await loadBridgeDoc('rappi'), brandParam(req));
+        if (summary?.stores && summary.stores.length > 0) {
+          const rows = summary.stores.map((store) => ({
             channel: 'rappi' as ChannelProvider,
             storeId: store.storeId,
             name: store.name,
@@ -112,7 +143,8 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
             rows,
             channels: [{ provider: 'rappi', ok: true }],
             source: 'bridge',
-            generatedAt: bridge.generatedAt ?? now.toISOString(),
+            brandId: summary.brandId ?? null,
+            generatedAt: summary.generatedAt ?? now.toISOString(),
           });
           return;
         }
@@ -120,7 +152,6 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
 
       const rows: ChannelStoreInput[] = [];
       const channels: Array<{ provider: string; ok: boolean; error?: string }> = [];
-
       for (const config of loadIntegrations()) {
         try {
           const connector = createConnector(config.provider, contextOf(config));
@@ -150,9 +181,9 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
 
     if (path.endsWith('/orders')) {
       if (bridgeEnabled(req)) {
-        const bridge = await loadBridge('rappi');
-        if (bridge?.orders && bridge.orders.length > 0) {
-          const rows = bridge.orders.map((o) => ({
+        const summary = pickBrand(await loadBridgeDoc('rappi'), brandParam(req));
+        if (summary?.orders && summary.orders.length > 0) {
+          const rows = summary.orders.map((o) => ({
             channel: 'rappi',
             storeId: '',
             storeName: String(o.store ?? ''),
@@ -161,7 +192,7 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
             itemCount: 1,
             total: typeof o.total === 'number' ? o.total : 0,
           }));
-          res.status(200).json({ orders: rows, source: 'bridge', generatedAt: bridge.generatedAt ?? now.toISOString() });
+          res.status(200).json({ orders: rows, source: 'bridge', generatedAt: summary.generatedAt ?? now.toISOString() });
           return;
         }
       }
@@ -184,11 +215,12 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
     }
 
     if (path.endsWith('/menu')) {
-      const bridge = await loadBridge('rappi');
+      const summary = pickBrand(await loadBridgeDoc('rappi'), brandParam(req));
       res.status(200).json({
-        source: bridge ? 'bridge' : 'none',
-        menus: bridge?.menus ?? [],
-        generatedAt: bridge?.generatedAt ?? now.toISOString(),
+        source: summary ? 'bridge' : 'none',
+        brandId: summary?.brandId ?? null,
+        menus: summary?.menus ?? [],
+        generatedAt: summary?.generatedAt ?? now.toISOString(),
       });
       return;
     }

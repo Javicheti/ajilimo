@@ -59,7 +59,7 @@ const sales = {
 
 // Órdenes (historial).
 const ordersRaw = findBody('orders/by-stores')?.results || [];
-const orders = ordersRaw.map((o) => ({
+let orders = ordersRaw.map((o) => ({
   orderId: o.id ?? '',
   user: (o.application_user_full_name ?? '').trim(),
   store: o.store_name ?? '',
@@ -70,8 +70,17 @@ const orders = ordersRaw.map((o) => ({
   isDispute: o.is_dispute === true,
 }));
 
-// Menú (por tienda).
-const menus = network
+// Fusiona con el summary previo si esta corrida no trajo órdenes (evita regresión).
+let previous = null;
+try {
+  previous = JSON.parse(await readFile(`${outDir}summary.json`, 'utf8'));
+} catch {
+  // sin summary previo
+}
+if (orders.length === 0 && previous?.orders?.length) orders = previous.orders;
+
+// Menú (por tienda). Preferimos out/menus.json (consulta directa) si existe.
+let menus = network
   .filter((r) => r.url.includes('complete-menu') && r.body && typeof r.body === 'object')
   .map((r) => ({
     storeId: r.body.store_id ?? null,
@@ -83,10 +92,17 @@ const menus = network
       suspendReason: it.suspend_reason ?? null,
     })),
   }));
+try {
+  const direct = JSON.parse(await readFile(`${outDir}menus.json`, 'utf8'));
+  if (Array.isArray(direct) && direct.length > 0) menus = direct;
+} catch {
+  // sin out/menus.json: usa lo capturado
+}
 
 const summary = {
   generatedAt: new Date().toISOString(),
-  brandId: 'PE57159',
+  brandId: String(storesRaw[0]?.brand_id ?? '57159'),
+  brandName: storesRaw[0]?.brand?.name ?? 'Alenkas Bakery',
   counts: { stores: stores.length, orders: orders.length, menus: menus.length },
   serviceMetrics,
   sales,
