@@ -1,32 +1,39 @@
-# Capturador — Portal Partners de Rappi
+# Puente temporal — Portal Partners de Rappi
 
-Herramienta de **captura de sesión** para descubrir las APIs internas que usa el
-Portal Partners (`partners.rappi.com`), ya que el portal es una SPA con login y no
-expone datos por HTTP directo.
+**Solo mientras llegan las credenciales oficiales.** Recolecta datos de **tu propia
+cuenta** del Portal Partners (SPA con login). No oculta ni evade el anti-bot: si el
+portal pide verificación, la resuelves tú manualmente. Se apaga en cuanto llegue la API oficial.
 
-> ⚠️ Uso responsable: es tu propia cuenta/operación. Automatizar el portal puede
-> chocar con los Términos de uso de Rappi. Preferible: solicitar acceso oficial
-> (API Growth/Promotions, Claims) al TAM. Usa esto solo como puente y bajo tu responsabilidad.
+> ⚠️ Uso responsable: es tu cuenta/operación. Automatizar el portal puede ir contra los
+> Términos de uso de Rappi. Prioridad: solicitar acceso oficial (Growth/Promotions, Claims,
+> Financial) al TAM. Mantén el ritmo bajo y apágalo cuando tengas la API.
 
-## Uso
+## Paso 1 — Capturar sesión + descubrir endpoints
 ```bash
 cd backend/scrapers/rappi-portal
 npm install
 npx playwright install chromium
 
-# Portal de ejemplo (ajusta fechas/brandId/storeIds):
-TARGET_URL="https://partners.rappi.com/home?from=2026-10-03&to=2026-10-10&brandId=PE57159&storeIds=PE73017,PE73507" npm run capture
+TARGET_URL="https://partners.rappi.com/home?from=2026-10-03&to=2026-10-10&brandId=PE57159&storeIds=PE73017,PE73507,PE73506" npm run capture
 ```
+- Chrome visible → **inicia sesión**.
+- Navega por **Inicio, Conectividad, Órdenes, Financiero, Menú**.
+- ENTER en la terminal.
+- Genera: `out/network.json` (APIs internas), `out/page.html`, `out/state.json` (sesión).
 
-1. Se abre Chrome **visible** con el portal.
-2. **Inicia sesión** manualmente (tu usuario) y navega a las secciones a capturar
-   (Inicio, Conectividad, Órdenes, Financiero, Menú…).
-3. Vuelve a la terminal y pulsa **ENTER**.
-4. Se guarda:
-   - `out/network.json` → todas las respuestas JSON (APIs internas).
-   - `out/page.html` → el DOM final.
+## Paso 2 — Recolectar con la sesión guardada
+Identifica en `out/network.json` las URLs de API y consúltalas:
+```bash
+ENDPOINTS="https://partners.rappi.com/api/.../stores,https://partners.rappi.com/api/.../orders" npm run fetch
+```
+- Guarda `out/results.json`.
 
-## Siguiente paso
-Con `out/network.json` identificamos los endpoints internos (p. ej. `/api/.../stores`,
-`/api/.../orders`) y construimos un **conector estable** (sesión → endpoints) que
-alimente el BFF, o bien un scraper de DOM si no hay API.
+## Paso 3 — Conector estable (siguiente)
+Con los endpoints identificados construimos un **conector** en el backend que:
+- usa la sesión guardada (o un login programático con tus credenciales por env),
+- normaliza los datos hacia **Conectividad, Órdenes, Financiero, Promos**,
+- se puede **desactivar** con una bandera cuando llegue la API oficial.
+
+## Seguridad
+- `out/` está en `.gitignore` (contiene tu sesión y datos). **No subas** `state.json` ni `network.json`.
+- Guarda ritmo bajo; una sola sesión; en horarios de baja carga.

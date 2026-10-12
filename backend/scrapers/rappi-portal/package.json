@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "capture": "node capture.mjs"
+    "capture": "node capture.mjs",
+    "fetch": "node fetch.mjs"
   },
   "dependencies": {
     "playwright": "^1.48.0"

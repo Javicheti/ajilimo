@@ -75,8 +75,10 @@ await new Promise((resolve) => {
 
 await writeFile(`${outDir}network.json`, JSON.stringify(captured, null, 2));
 await writeFile(`${outDir}page.html`, await page.content());
+await context.storageState({ path: `${outDir}state.json` });
 
 console.log(`✅ Guardadas ${captured.length} respuestas JSON en ${outDir}network.json`);
-console.log('   y el DOM en out/page.html');
+console.log('   DOM en out/page.html');
+console.log('   Sesión reutilizable en out/state.json (NO la compartas ni la subas al repo)');
 
 await browser.close();
