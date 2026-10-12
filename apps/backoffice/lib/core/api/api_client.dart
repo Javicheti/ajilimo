@@ -62,6 +62,17 @@ class ApiClient {
     final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
     return (data['claims'] as List<dynamic>).cast<Map<String, dynamic>>();
   }
+
+  /// Reportes/indicadores del bridge (datos reales del Portal Rappi).
+  Future<Map<String, dynamic>> getReports() async {
+    final http.Response response = await _client
+        .get(Uri.parse('$baseUrl/reports'))
+        .timeout(const Duration(seconds: 10));
+    if (response.statusCode != 200) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
 }
 
 final Provider<ApiClient> apiClientProvider = Provider<ApiClient>((ref) => ApiClient());

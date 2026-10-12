@@ -43,6 +43,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                 title: 'Reportes',
                 subtitle: 'Ventas por marca, app, producto y tienda · culminados y cancelados',
               ),
+              const _BridgeSection(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -148,6 +149,52 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BridgeSection extends ConsumerWidget {
+  const _BridgeSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<Map<String, dynamic>> async = ref.watch(bridgeReportsProvider);
+    return async.maybeWhen(
+      data: (Map<String, dynamic> data) {
+        if (data['source'] != 'bridge') return const SizedBox.shrink();
+        final Map<String, dynamic> m = (data['serviceMetrics'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+        final Map<String, dynamic> s = (data['sales'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+        double n(Object? v) => v is num ? v.toDouble() : 0;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            AppCard(
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.cloud_done_outlined, color: context.colors.brandPrimary),
+                  const SizedBox(width: Spacing.sm),
+                  Text('Rappi · Portal Partners (datos reales)', style: Theme.of(context).textTheme.titleSmall),
+                  const Spacer(),
+                  Text('Bridge activo', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.colors.success)),
+                ],
+              ),
+            ),
+            const SizedBox(height: Spacing.md),
+            Wrap(
+              spacing: Spacing.md,
+              runSpacing: Spacing.md,
+              children: <Widget>[
+                SizedBox(width: 215, child: KpiCard(label: 'Reclamos (Portal)', value: '${n(m['reclamosPct']).toStringAsFixed(1)}%', icon: Icons.gavel_outlined, accent: context.colors.danger)),
+                SizedBox(width: 215, child: KpiCard(label: 'Disponibilidad (Portal)', value: '${n(m['disponibilidadPct']).toStringAsFixed(1)}%', icon: Icons.wifi_tethering, accent: context.colors.warning)),
+                SizedBox(width: 215, child: KpiCard(label: 'Espera repartidor', value: '${n(m['esperaRepartidorMin']).toStringAsFixed(2)} min', icon: Icons.timer_outlined, accent: context.colors.info)),
+                SizedBox(width: 215, child: KpiCard(label: 'Ventas (Portal)', value: 'S/ ${n(s['totalAmount']).toStringAsFixed(2)}', icon: Icons.payments_outlined, accent: context.colors.brandPrimary)),
+              ],
+            ),
+            const SizedBox(height: Spacing.lg),
+          ],
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }

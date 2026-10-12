@@ -25,4 +25,7 @@ class FakeApi extends ApiClient {
 
   @override
   Future<List<Map<String, dynamic>>> getConnections() async => connections;
+
+  @override
+  Future<Map<String, dynamic>> getReports() async => <String, dynamic>{'source': 'none'};
 }
