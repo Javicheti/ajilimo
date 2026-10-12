@@ -72,10 +72,11 @@ class ControlTowerRepository {
         ),
       ];
 
-  Future<List<StoreStatusRow>> fetchRemote({String? brand}) async {
-    if (api == null) return const <StoreStatusRow>[];
-    final List<Map<String, dynamic>> rows = await api!.getControlTower(brand: brand);
-    return rows
+  Future<({List<StoreStatusRow> rows, String? generatedAt})> fetchRemote({String? brand}) async {
+    if (api == null) return (rows: const <StoreStatusRow>[], generatedAt: null);
+    final ({List<Map<String, dynamic>> rows, String? generatedAt}) result =
+        await api!.getControlTower(brand: brand);
+    final List<StoreStatusRow> mapped = result.rows
         .map(
           (row) => StoreStatusRow(
             storeId: (row['storeId'] ?? '') as String,
@@ -86,6 +87,7 @@ class ControlTowerRepository {
           ),
         )
         .toList();
+    return (rows: mapped, generatedAt: result.generatedAt);
   }
 
   static DeliveryChannel _channel(String? value) {

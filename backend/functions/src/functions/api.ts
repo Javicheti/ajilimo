@@ -23,6 +23,12 @@ interface BridgeStore {
   isPublished?: boolean;
 }
 
+interface BrandCatalogEntry {
+  brandId: string;
+  brandName: string;
+  stores?: Array<{ id: string; name: string }>;
+}
+
 interface BridgeSummary {
   brandId?: string;
   brandName?: string;
@@ -33,10 +39,12 @@ interface BridgeSummary {
   sales?: Record<string, unknown>;
   orders?: Array<Record<string, unknown>>;
   menus?: Array<Record<string, unknown>>;
+  brandsCatalog?: BrandCatalogEntry[];
 }
 
 interface BridgeDoc {
   defaultBrandId?: string;
+  brandsCatalog?: BrandCatalogEntry[];
   brands?: Record<string, BridgeSummary>;
 }
 
@@ -63,7 +71,13 @@ async function saveBrandSummary(provider: string, summary: BridgeSummary): Promi
   const current = (snap.exists ? (snap.data() as BridgeDoc) : {}) ?? {};
   const brands: Record<string, BridgeSummary> = { ...(current.brands ?? {}) };
   brands[brandId] = { ...summary, receivedAt: new Date().toISOString() } as BridgeSummary;
-  await ref.set({ defaultBrandId: brandId, brands }, { merge: false });
+  const doc: BridgeDoc = { defaultBrandId: brandId, brands };
+  if (summary.brandsCatalog && summary.brandsCatalog.length > 0) {
+    doc.brandsCatalog = summary.brandsCatalog;
+  } else if (current.brandsCatalog) {
+    doc.brandsCatalog = current.brandsCatalog;
+  }
+  await ref.set(doc, { merge: false });
 }
 
 function brandParam(req: { query: Record<string, unknown> }): string | undefined {
@@ -106,9 +120,12 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
     // --- Marcas disponibles (bridge) ------------------------------------
     if (path.endsWith('/brands')) {
       const doc = await loadBridgeDoc('rappi');
-      const brands = doc?.brands
-        ? Object.entries(doc.brands).map(([brandId, s]) => ({ brandId, brandName: s.brandName ?? brandId }))
-        : [];
+      const catalog = doc?.brandsCatalog ?? [];
+      const brands = catalog.length > 0
+        ? catalog.map((b) => ({ brandId: String(b.brandId), brandName: String(b.brandName) }))
+        : doc?.brands
+          ? Object.entries(doc.brands).map(([brandId, s]) => ({ brandId, brandName: s.brandName ?? brandId }))
+          : [];
       res.status(200).json({ brands, defaultBrandId: doc?.defaultBrandId ?? null });
       return;
     }
@@ -130,7 +147,8 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
 
     if (path.endsWith('/control-tower')) {
       if (bridgeEnabled(req)) {
-        const summary = pickBrand(await loadBridgeDoc('rappi'), brandParam(req));
+        const doc = await loadBridgeDoc('rappi');
+        const summary = pickBrand(doc, brandParam(req));
         if (summary?.stores && summary.stores.length > 0) {
           const rows = summary.stores.map((store) => ({
             channel: 'rappi' as ChannelProvider,
@@ -145,6 +163,28 @@ export const api = onRequest({ cors: true, region: 'us-central1' }, async (req, 
             source: 'bridge',
             brandId: summary.brandId ?? null,
             generatedAt: summary.generatedAt ?? now.toISOString(),
+          });
+          return;
+        }
+
+        // Fallback: catálogo de marcas (todas) con sus tiendas.
+        const catalog = doc?.brandsCatalog ?? [];
+        const selectedId = brandParam(req) || doc?.defaultBrandId || (catalog[0] ? String(catalog[0].brandId) : undefined);
+        const brand = catalog.find((b) => String(b.brandId) === selectedId);
+        if (brand?.stores && brand.stores.length > 0) {
+          const rows = brand.stores.map((s) => ({
+            channel: 'rappi' as ChannelProvider,
+            storeId: String(s.id),
+            name: String(s.name),
+            brand: String(brand.brandName),
+            status: 'open',
+          }));
+          res.status(200).json({
+            rows,
+            channels: [{ provider: 'rappi', ok: true }],
+            source: 'bridge-catalog',
+            brandId: selectedId,
+            generatedAt: now.toISOString(),
           });
           return;
         }

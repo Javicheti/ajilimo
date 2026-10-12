@@ -99,11 +99,23 @@ try {
   // sin out/menus.json: usa lo capturado
 }
 
+// Catálogo de todas las marcas (si existe).
+let brandsCatalog = [];
+try {
+  const catalog = JSON.parse(await readFile(`${outDir}brands.json`, 'utf8'));
+  if (Array.isArray(catalog)) brandsCatalog = catalog;
+} catch {
+  // sin catálogo
+}
+
 const summary = {
   generatedAt: new Date().toISOString(),
-  brandId: String(storesRaw[0]?.brand_id ?? '57159'),
+  brandId: String(storesRaw[0]?.brand_id ?? '57159').startsWith('PE')
+    ? String(storesRaw[0]?.brand_id)
+    : `PE${storesRaw[0]?.brand_id ?? '57159'}`,
   brandName: storesRaw[0]?.brand?.name ?? 'Alenkas Bakery',
   counts: { stores: stores.length, orders: orders.length, menus: menus.length },
+  brandsCatalog,
   serviceMetrics,
   sales,
   stores,

@@ -18,7 +18,7 @@ class ApiClient {
   final String baseUrl;
   final http.Client _client;
 
-  Future<List<Map<String, dynamic>>> getControlTower({String? brand}) async {
+  Future<({List<Map<String, dynamic>> rows, String? generatedAt})> getControlTower({String? brand}) async {
     final Uri uri = Uri.parse('$baseUrl/control-tower').replace(
       queryParameters: brand != null ? <String, String>{'brand': brand} : null,
     );
@@ -27,11 +27,14 @@ class ApiClient {
       throw Exception('HTTP ${response.statusCode}');
     }
     final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
-    return (data['rows'] as List<dynamic>).cast<Map<String, dynamic>>();
+    return (
+      rows: (data['rows'] as List<dynamic>).cast<Map<String, dynamic>>(),
+      generatedAt: data['generatedAt'] as String?,
+    );
   }
 
-  /// Marcas disponibles (bridge).
-  Future<List<Map<String, dynamic>>> getBrands() async {
+  /// Marcas disponibles (bridge) + marca por defecto.
+  Future<({List<Map<String, dynamic>> brands, String? defaultBrandId})> getBrands() async {
     final http.Response response = await _client
         .get(Uri.parse('$baseUrl/brands'))
         .timeout(const Duration(seconds: 8));
@@ -39,7 +42,10 @@ class ApiClient {
       throw Exception('HTTP ${response.statusCode}');
     }
     final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
-    return (data['brands'] as List<dynamic>).cast<Map<String, dynamic>>();
+    return (
+      brands: (data['brands'] as List<dynamic>).cast<Map<String, dynamic>>(),
+      defaultBrandId: data['defaultBrandId'] as String?,
+    );
   }
 
   Future<List<Map<String, dynamic>>> getConnections() async {

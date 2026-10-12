@@ -17,10 +17,12 @@ class FakeApi extends ApiClient {
   final List<Map<String, dynamic>> brands;
 
   @override
-  Future<List<Map<String, dynamic>>> getControlTower({String? brand}) async => controlTower;
+  Future<({List<Map<String, dynamic>> rows, String? generatedAt})> getControlTower({String? brand}) async =>
+      (rows: controlTower, generatedAt: null);
 
   @override
-  Future<List<Map<String, dynamic>>> getBrands() async => brands;
+  Future<({List<Map<String, dynamic>> brands, String? defaultBrandId})> getBrands() async =>
+      (brands: brands, defaultBrandId: null);
 
   @override
   Future<List<Map<String, dynamic>>> getOrders() async => orders;

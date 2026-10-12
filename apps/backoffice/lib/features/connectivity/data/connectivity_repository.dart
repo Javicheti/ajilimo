@@ -25,7 +25,9 @@ class ConnectivityRepository {
 
   Future<List<ConnectivityRow>> fetchRemote() async {
     if (api == null) return const <ConnectivityRow>[];
-    final List<Map<String, dynamic>> rows = await api!.getControlTower();
+    final ({List<Map<String, dynamic>> rows, String? generatedAt}) result =
+        await api!.getControlTower();
+    final List<Map<String, dynamic>> rows = result.rows;
     return rows
         .map(
           (row) => ConnectivityRow(

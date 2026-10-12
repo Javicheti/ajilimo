@@ -16,6 +16,7 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
   DeliveryChannel? _channelFilter;
   late List<StoreStatusRow> _all;
   String? _brand;
+  String? _updatedAt;
   List<Map<String, dynamic>> _brands = <Map<String, dynamic>>[];
 
   @override
@@ -28,11 +29,12 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
 
   Future<void> _initBrands(ControlTowerRepository repository) async {
     try {
-      final List<Map<String, dynamic>> brands = await ref.read(apiClientProvider).getBrands();
-      if (mounted && brands.isNotEmpty) {
+      final ({List<Map<String, dynamic>> brands, String? defaultBrandId}) result =
+          await ref.read(apiClientProvider).getBrands();
+      if (mounted && result.brands.isNotEmpty) {
         setState(() {
-          _brands = brands;
-          _brand ??= brands.first['brandId'] as String?;
+          _brands = result.brands;
+          _brand ??= result.defaultBrandId ?? result.brands.first['brandId'] as String?;
         });
       }
     } catch (_) {
@@ -43,9 +45,13 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
 
   Future<void> _loadRemote(ControlTowerRepository repository) async {
     try {
-      final List<StoreStatusRow> remote = await repository.fetchRemote(brand: _brand);
-      if (!mounted || remote.isEmpty) return;
-      setState(() => _all = remote);
+      final ({List<StoreStatusRow> rows, String? generatedAt}) data =
+          await repository.fetchRemote(brand: _brand);
+      if (!mounted || data.rows.isEmpty) return;
+      setState(() {
+        _all = data.rows;
+        _updatedAt = data.generatedAt;
+      });
     } catch (_) {
       // Sin BFF disponible: se mantienen los datos ficticios locales.
     }
@@ -54,6 +60,15 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
   void _onBrandChanged(String? brand) {
     setState(() => _brand = brand);
     _loadRemote(ref.read(controlTowerRepositoryProvider));
+  }
+
+  String get _updatedLabel {
+    final String? raw = _updatedAt;
+    if (raw == null) return '';
+    final DateTime? dt = DateTime.tryParse(raw)?.toLocal();
+    if (dt == null) return '';
+    String two(int v) => v.toString().padLeft(2, '0');
+    return ' · actualizado ${two(dt.hour)}:${two(dt.minute)}';
   }
 
   @override
@@ -74,7 +89,7 @@ class _ControlTowerPageState extends ConsumerState<ControlTowerPage> {
           icon: Icons.grid_view_rounded,
           eyebrow: 'Operación',
           title: 'Torre de control',
-          subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención',
+          subtitle: '${rows.length} tiendas · ${alerts.length} requieren atención$_updatedLabel',
           actions: <Widget>[
             if (_brands.isNotEmpty) _BrandSelector(brands: _brands, value: _brand, onChanged: _onBrandChanged),
           ],
